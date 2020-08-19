@@ -25,7 +25,8 @@
         "php": "^7.3",
         "ext-dom": "*",
         "ext-pdo": "*",
-        "ext-json": "*"
+        "ext-json": "*",
+        "algolia/algoliasearch-client-php": "^2.7"
     },
     "autoload": {
         "psr-4": {

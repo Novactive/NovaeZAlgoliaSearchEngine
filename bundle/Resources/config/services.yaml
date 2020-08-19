@@ -3,3 +3,24 @@ services:
         autowire: true
         autoconfigure: true
         public: false
+
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\:
+        resource: '../../Core'
+
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\Indexer:
+        arguments:
+            $logger: '@logger'
+            $persistenceHandler: '@ezpublish.api.storage_engine'
+            $connection: '@ezpublish.persistence.connection'
+            $searchHandler: '@Novactive\Bundle\eZAlgoliaSearchEngine\Core\Handler'
+        lazy: true
+        tags:
+            - { name: ezplatform.search_engine.indexer, alias: algolia }
+
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\Handler:
+#        arguments:
+#            $contentQueryCoordinator: '@ezplatform.search.algolia.query.content.coordinator'
+#            $locationQueryCoordinator: '@ezplatform.search.algolia.query.location.coordinator'
+        lazy: true
+        tags:
+            - { name: ezplatform.search_engine, alias: algolia }

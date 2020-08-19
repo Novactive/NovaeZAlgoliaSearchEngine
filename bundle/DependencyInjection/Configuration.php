@@ -18,7 +18,6 @@ final class Configuration extends SAConfiguration
 {
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        //gdfgdg
         return new TreeBuilder('nova_ezalgoliasearchengine');
     }
 }
