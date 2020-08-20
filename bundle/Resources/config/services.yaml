@@ -18,9 +18,26 @@ services:
             - { name: ezplatform.search_engine.indexer, alias: algolia }
 
     Novactive\Bundle\eZAlgoliaSearchEngine\Core\Handler:
-#        arguments:
-#            $contentQueryCoordinator: '@ezplatform.search.algolia.query.content.coordinator'
-#            $locationQueryCoordinator: '@ezplatform.search.algolia.query.location.coordinator'
+        arguments:
+            $gateway: '@ezpublish.search.legacy.gateway.content'
+            $locationGateway: '@ezpublish.search.legacy.gateway.location'
+            $indexerGateway: '@eZ\Publish\Core\Search\Legacy\Content\WordIndexer\Gateway\DoctrineDatabase'
+            $contentMapper: '@ezpublish.persistence.legacy.content.mapper'
+            $locationMapper: '@ezpublish.persistence.legacy.location.mapper'
+            $languageHandler: '@ezpublish.spi.persistence.language_handler'
+            $mapper: '@ezpublish.search.legacy.fulltext_mapper'
         lazy: true
         tags:
             - { name: ezplatform.search_engine, alias: algolia }
+
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\Converter:
+        arguments:
+            $persistenceHandler: '@ezpublish.api.storage_engine'
+            $fieldRegistry: '@ezpublish.search.common.field_registry'
+            $fieldNameGenerator: '@ezpublish.search.common.field_name_generator'
+            $fieldTypeRegistry: '@ezpublish.persistence.field_type_registry'
+
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\DocumentSerializer:
+        arguments:
+            $fieldValueMapper: '@ezpublish.search.common.field_value_mapper.aggregate'
+            $fieldNameGenerator: '@ezpublish.search.common.field_name_generator'

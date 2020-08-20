@@ -40,7 +40,7 @@ class Indexer extends IncrementalIndexer
 
     public function getName(): string
     {
-        return 'eZ Platform Solr Search Engine';
+        return 'eZ Platform Algolia Search Engine';
     }
 
     public function purge(): void
@@ -50,33 +50,5 @@ class Indexer extends IncrementalIndexer
 
     public function updateSearchIndex(array $contentIds, $commit): void
     {
-
-//        $contentHandler = $this->persistenceHandler->contentHandler();
-//        $locationHandler = $this->persistenceHandler->locationHandler();
-//
-//        $documents = new AppendIterator();
-//        foreach ($contentIds as $contentId) {
-//            try {
-//                $contentInfo = $contentHandler->loadContentInfo($contentId);
-//                if ($contentInfo->status === ContentInfo::STATUS_PUBLISHED) {
-//                    $content = $contentHandler->load($contentId);
-//                    $locations = $locationHandler->loadLocationsByContent($contentId);
-//
-//                    $documents->append($this->documentFactory->fromContent($content));
-//                    foreach ($locations as $location) {
-//                        $documents->append($this->documentFactory->fromLocation($location, $content));
-//                    }
-//                }
-//            } catch (NotFoundException $e) {
-//                $this->searchHandler->deleteContent($contentId);
-//            } catch (Exception $e) {
-//                $this->logger->error('Unable to index the content', [
-//                    'contentId' => $contentId,
-//                    'error' => $e->getMessage(),
-//                ]);
-//            }
-//        }
-//
-//        $this->searchHandler->addDocuments($documents);
     }
 }
