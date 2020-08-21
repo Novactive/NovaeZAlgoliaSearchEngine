@@ -16,11 +16,20 @@ use eZ\Publish\Core\Search\Legacy\Content\Handler as LegacyHandler;
 
 class Handler extends LegacyHandler
 {
-    private AlgoliaClient $client;
+    /**
+     * @var AlgoliaClient
+     */
+    private $client;
 
-    private Converter $converter;
+    /**
+     * @var Converter
+     */
+    private $converter;
 
-    private DocumentSerializer $documentSerializer;
+    /**
+     * @var DocumentSerializer
+     */
+    private $documentSerializer;
 
     /**
      * @required
@@ -37,15 +46,11 @@ class Handler extends LegacyHandler
 
     public function indexContent(Content $content): void
     {
-        $data = [];
         foreach ($this->converter->convertContent($content) as $document) {
-            dump($document);
             $array = $this->documentSerializer->serialize($document);
             $array['objectID'] = $document->id;
-            $data[] = $array;
+            $this->client->getIndex($array['meta_indexed_language_code_s'])->saveObjects([$array]);
         }
-        dd($data);
-        $this->client->getIndex()->saveObjects($data);
 
         parent::indexContent($content);
     }

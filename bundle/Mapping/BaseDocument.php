@@ -15,5 +15,8 @@ use eZ\Publish\SPI\Search\Document;
 
 abstract class BaseDocument extends Document
 {
-    public int $contentTypeId;
+    /**
+     * @var int
+     */
+    public $contentTypeId;
 }

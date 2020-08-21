@@ -14,7 +14,7 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core;
 use Algolia\AlgoliaSearch\SearchClient;
 use Algolia\AlgoliaSearch\SearchIndex;
 
-class AlgoliaClient
+final class AlgoliaClient
 {
     private const CONFIG = [
         'index_name' => 'Local',
@@ -22,7 +22,10 @@ class AlgoliaClient
         'app_secret' => 'ab4bc3a760e3190c2f11203d7089db07'
     ];
 
-    private array $indexes;
+    /**
+     * @var array
+     */
+    private $indexes;
 
     public function getIndex(?string $suffix = null): SearchIndex
     {

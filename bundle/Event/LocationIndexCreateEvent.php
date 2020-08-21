@@ -17,9 +17,15 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class LocationIndexCreateEvent extends Event
 {
-    private Location $location;
+    /**
+     * @var Location
+     */
+    private $location;
 
-    private LocationDocument $document;
+    /**
+     * @var LocationDocument
+     */
+    private $document;
 
     public function __construct(Location $location, LocationDocument $document)
     {

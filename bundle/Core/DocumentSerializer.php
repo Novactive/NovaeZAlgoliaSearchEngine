@@ -15,12 +15,17 @@ use eZ\Publish\Core\Search\Common\FieldNameGenerator;
 use eZ\Publish\Core\Search\Common\FieldValueMapper;
 use eZ\Publish\SPI\Search\Document;
 
-class DocumentSerializer
+final class DocumentSerializer
 {
+    /**
+     * @var FieldValueMapper
+     */
+    private $fieldValueMapper;
 
-    private FieldValueMapper $fieldValueMapper;
-
-    private FieldNameGenerator $nameGenerator;
+    /**
+     * @var FieldNameGenerator
+     */
+    private $nameGenerator;
 
     public function __construct(FieldValueMapper $fieldValueMapper, FieldNameGenerator $fieldNameGenerator)
     {

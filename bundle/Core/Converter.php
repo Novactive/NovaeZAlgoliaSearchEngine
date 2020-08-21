@@ -23,7 +23,6 @@ use eZ\Publish\SPI\Persistence\Content\VersionInfo;
 use eZ\Publish\SPI\Persistence\Handler as PersistenceHandler;
 use eZ\Publish\SPI\Search\Document;
 use eZ\Publish\SPI\Search\Field;
-use eZ\Publish\SPI\Search\FieldType;
 use eZ\Publish\SPI\Search\FieldType\BooleanField;
 use eZ\Publish\SPI\Search\FieldType\DateField;
 use eZ\Publish\SPI\Search\FieldType\IntegerField;
@@ -36,21 +35,36 @@ use Novactive\Bundle\eZAlgoliaSearchEngine\Event\ContentIndexCreateEvent;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Event\LocationIndexCreateEvent;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\ContentDocument;
 use eZ\Publish\SPI\Search\FieldType\IdentifierField;
-use eZ\Publish\Core\Persistence\FieldType as PersistenceFieldType;
+use eZ\Publish\Core\Persistence\FieldType;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\LocationDocument;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class Converter
+final class Converter
 {
-    private PersistenceHandler $persistenceHandler;
+    /**
+     * @var PersistenceHandler
+     */
+    private $persistenceHandler;
 
-    private FieldRegistry $fieldRegistry;
+    /**
+     * @var FieldRegistry
+     */
+    private $fieldRegistry;
 
-    private FieldTypeRegistry $fieldTypeRegistry;
+    /**
+     * @var FieldTypeRegistry
+     */
+    private $fieldTypeRegistry;
 
-    private FieldNameGenerator $fieldNameGenerator;
+    /**
+     * @var FieldNameGenerator
+     */
+    private $fieldNameGenerator;
 
-    private EventDispatcherInterface $eventDispatcher;
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
     public function __construct(
         PersistenceHandler $persistenceHandler,
@@ -380,7 +394,7 @@ class Converter
                     continue;
                 }
 
-                /** @var PersistenceFieldType $fieldType */
+                /** @var FieldType $fieldType */
                 $fieldType = $this->fieldTypeRegistry->getFieldType($fieldDefinition->fieldType);
 
                 $document->fields[] = new Field(

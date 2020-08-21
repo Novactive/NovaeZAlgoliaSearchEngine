@@ -17,9 +17,15 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class ContentIndexCreateEvent extends Event
 {
-    private Content $content;
+    /**
+     * @var Content
+     */
+    private $content;
 
-    private ContentDocument $document;
+    /**
+     * @var ContentDocument
+     */
+    private $document;
 
     public function __construct(Content $content, ContentDocument $document)
     {
