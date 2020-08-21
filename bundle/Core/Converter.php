@@ -66,18 +66,25 @@ final class Converter
      */
     private $eventDispatcher;
 
+    /**
+     * @var DocumentIdGenerator
+     */
+    private $documentIdGenerator;
+
     public function __construct(
         PersistenceHandler $persistenceHandler,
         FieldRegistry $fieldRegistry,
         FieldNameGenerator $fieldNameGenerator,
         FieldTypeRegistry $fieldTypeRegistry,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        DocumentIdGenerator $documentIdGenerator
     ) {
         $this->persistenceHandler = $persistenceHandler;
         $this->fieldRegistry = $fieldRegistry;
         $this->fieldNameGenerator = $fieldNameGenerator;
         $this->fieldTypeRegistry = $fieldTypeRegistry;
         $this->eventDispatcher = $eventDispatcher;
+        $this->documentIdGenerator = $documentIdGenerator;
     }
 
     public function convertContent(Content $content): Iterator
@@ -100,7 +107,7 @@ final class Converter
             $isMainTranslation = $contentInfo->mainLanguageCode === $languageCode;
 
             $document = clone $baseDocument;
-            $document->id = sprintf('content-%d-%s', $contentInfo->id, $languageCode);
+            $document->id = $this->documentIdGenerator->generateContentDocumentId($contentInfo->id, $languageCode);
             $document->contentTypeId = $contentInfo->contentTypeId;
             $document->languageCode = $languageCode;
             $document->isMainTranslation = $isMainTranslation;
@@ -194,7 +201,7 @@ final class Converter
             $isMainTranslation = $contentInfo->mainLanguageCode === $languageCode;
 
             $document = clone $baseDocument;
-            $document->id = sprintf('location-%d-%s', $location->id, $languageCode);
+            $document->id = $this->documentIdGenerator->generateLocationDocumentId($location->id, $languageCode);
             $document->contentTypeId = $contentInfo->contentTypeId;
             $document->languageCode = $languageCode;
             $document->isMainTranslation = $isMainTranslation;
