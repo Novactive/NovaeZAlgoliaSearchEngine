@@ -233,7 +233,7 @@ final class Converter
             new StringField()
         );
 
-        $this->addContentTypeFields($document, $contentType);
+        $this->addContentTypeFields($document, $contentType, $contentInfo->mainLanguageCode);
         $this->addUserMetadataFields($document, $contentInfo);
 
         $this->addLanguagesFields($document, $contentInfo);
@@ -433,12 +433,18 @@ final class Converter
         }
     }
 
-    private function addContentTypeFields(Document $document, ContentType $contentType): void
+    private function addContentTypeFields(Document $document, ContentType $contentType, string $languageCode): void
     {
         $document->fields[] = new Field(
             'content_type_id',
             $contentType->id,
             new IntegerField()
+        );
+
+        $document->fields[] = new Field(
+            'content_type_name',
+            $contentType->name[$languageCode] ?? $contentType->name[array_key_first($contentType->name)],
+            new StringField()
         );
 
         $document->fields[] = new Field(
@@ -475,8 +481,8 @@ final class Converter
             // Remove Root Location id
             array_shift($path);
 
-            // was array_merge before
-            $locationIds = [...$locationIds, ...$path];
+            // can be optimized
+            $locationIds = array_merge($locationIds, $path);
         }
 
         $contentIds = [];

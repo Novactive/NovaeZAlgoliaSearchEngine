@@ -73,11 +73,12 @@ class Handler extends LegacyHandler
 
     public function indexLocation(Location $location): void
     {
-        foreach ($this->converter->convertLocation($location) as $document) {
-            $array = $this->documentSerializer->serialize($document);
-            $array['objectID'] = $document->id;
-            $this->client->getIndex($array['meta_indexed_language_code_s'])->saveObjects([$array]);
-        }
+        // @todo: should figure out if locations should be indexed as well
+//        foreach ($this->converter->convertLocation($location) as $document) {
+//            $array = $this->documentSerializer->serialize($document);
+//            $array['objectID'] = $document->id;
+//            $this->client->getIndex($array['meta_indexed_language_code_s'])->saveObjects([$array]);
+//        }
 
         parent::indexLocation($location);
     }

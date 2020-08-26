@@ -47,3 +47,14 @@ return [
     Novactive\Bundle\eZAlgoliaSearchEngine\NovaEzAlgoliaSearchEngine::class => ['all' => true],
 ];
 ```
+
+### Add routes
+
+```yaml
+_novaezalgoliasearchengine_routes:
+    resource: '@NovaEzAlgoliaSearchEngine/Resources/config/routing.yaml'
+```
+
+### ENV variables
+
+The `SEARCH_ENGINE` environment variable  should be set to `algolia`

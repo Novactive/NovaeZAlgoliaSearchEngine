@@ -54,9 +54,45 @@ final class SetupIndexes extends Command
         $io = new SymfonyStyle($input, $output);
 
         foreach ($this->languageService->loadLanguages() as $language) {
+
             $index = $this->client->getIndex($language->languageCode);
-            $index->setSettings(['searchableAttributes' => Query::SEARCH_ATTRIBUTES]);
+
+            $replicaNames = array_map(
+                static function (string $suffix) use ($index) {
+                    return "{$index->getIndexName()}-{$suffix}";
+                },
+                array_keys(Query::REPLICAS)
+            );
+
+            $index->setSettings(
+                [
+                    'searchableAttributes' => Query::SEARCH_ATTRIBUTES,
+                    'attributesForFaceting' => Query::ATTRIBUTES_FOR_FACETING,
+                    'replicas' => $replicaNames,
+                ],
+                ['forwardToReplicas' => true]
+            );
+
             $io->section('Index '.$index->getIndexName().' created.');
+
+            foreach (Query::REPLICAS as $replicaSuffix => $attributes) {
+                $replica = $this->client->getIndex($language->languageCode, $replicaSuffix);
+                $io->writeln('replica '.$replica->getIndexName().' set');
+                $replica->setSettings(
+                    [
+                        'ranking' => array_merge(
+                            $attributes['condition'],
+                            [
+                                'typo',
+                                'words',
+                                'proximity',
+                                'attribute',
+                                'exact',
+                            ]
+                        ),
+                    ]
+                );
+            }
         }
 
         $io->success('Done.');

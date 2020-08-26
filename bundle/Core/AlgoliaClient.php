@@ -16,7 +16,7 @@ use Algolia\AlgoliaSearch\SearchIndex;
 
 final class AlgoliaClient
 {
-    private const CONFIG = [
+    public const CONFIG = [
         'index_name' => 'Local',
         'app_id' => '3EUIQ3IJ9E',
         'app_secret' => 'ab4bc3a760e3190c2f11203d7089db07'
@@ -27,9 +27,12 @@ final class AlgoliaClient
      */
     private $indexes;
 
-    public function getIndex(?string $suffix = null): SearchIndex
+    public function getIndex(string $languageCode, ?string $replicaSuffix = null): SearchIndex
     {
-        $indexName = null === $suffix ? self::CONFIG['index_name'] : self::CONFIG['index_name'].'-'.$suffix;
+        $indexName = self::CONFIG['index_name'].'-'.$languageCode;
+        if (null !== $replicaSuffix) {
+            $indexName .= '-'.$replicaSuffix;
+        }
 
         if (isset($this->indexes[$indexName])) {
             return $this->indexes[$indexName];

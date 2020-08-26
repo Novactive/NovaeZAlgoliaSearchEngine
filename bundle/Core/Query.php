@@ -18,6 +18,7 @@ final class Query
         'content_remote_id_id',
         'content_name_s',
         'content_type_id_i',
+        'content_type_name_s',
         'content_type_group_id_mi',
         'content_owner_user_id_i',
         'content_owner_user_group_id_mi',
@@ -57,5 +58,44 @@ final class Query
         'article_body_value_s',
         'article_body_fulltext_fulltext',
         'image_is_empty_b'
+    ];
+
+    public const ATTRIBUTES_FOR_FACETING = [
+        'content_type_name_s'
+    ];
+
+    public const REPLICAS = [
+        'sort_by_content_name_asc' => [
+            'condition' => [
+                'asc(content_name_s)'
+            ],
+            'label' => [
+                'eng-GB' => 'Content Name Asc.'
+            ]
+        ],
+        'sort_by_content_name_desc' => [
+            'condition' => [
+                'desc(content_name_s)'
+            ],
+            'label' => [
+                'eng-GB' => 'Content Name Desc.'
+            ]
+        ],
+        'sort_by_publication_date_asc' => [
+            'condition' => [
+                'asc(content_publication_date_dt)'
+            ],
+            'label' => [
+                'eng-GB' => 'Publication Date Asc.'
+            ]
+        ],
+        'sort_by_publication_date_desc' => [
+            'condition' => [
+                'desc(content_publication_date_dt)'
+            ],
+            'label' => [
+                'eng-GB' => 'Publication Date Desc.'
+            ]
+        ],
     ];
 }
