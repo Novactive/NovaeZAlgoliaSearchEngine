@@ -1,1 +1,14 @@
 nova_ezalgoliasearchengine:
+
+
+
+webpack_encore:
+    builds:
+        nova_ezalgolia: "%kernel.project_dir%/public/assets/nova_ezalgolia/build"
+
+framework:
+    assets:
+        packages:
+            nova_ezalgolia:
+                json_manifest_path: '%kernel.project_dir%/public/assets/nova_ezalgolia/build/manifest.json'
+

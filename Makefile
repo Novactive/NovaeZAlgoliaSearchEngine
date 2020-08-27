@@ -25,10 +25,12 @@ list:
 .PHONY: installez
 installez: ## Install eZ as the local project
 	@docker run -d -p 3355:3306 --name $(DOCKER_DB_CONTAINER) -e MYSQL_ROOT_PASSWORD=ezplatform mariadb:10.3
-	@composer create-project --repository=https://updates.ez.no/bul/ ezsystems/ezplatform-ee $(EZ_DIR)
+	@composer create-project ezsystems/ezplatform-ee --prefer-dist --no-progress --no-interaction --no-scripts --repository=https://updates.ez.no/bul/  $(EZ_DIR)
 	@curl -o tests/provisioning/wrap.php https://raw.githubusercontent.com/Plopix/symfony-bundle-app-wrapper/master/wrap-bundle.php
 	@WRAP_APP_DIR=./ezplatform WRAP_BUNDLE_DIR=./ php tests/provisioning/wrap.php
 	@rm tests/provisioning/wrap.php
+	@mkdir -p $(EZ_DIR)/node_modules && ln -s $(EZ_DIR)/node_modules
+	@cd $(EZ_DIR) && yarn add --dev react react-dom react-instantsearch-dom algoliasearch
 	@echo "DATABASE_URL=mysql://root:ezplatform@127.0.0.1:3355/ezplatform" >>  $(EZ_DIR)/.env.local
 	@cd $(EZ_DIR) && composer update --lock
 	@cd $(EZ_DIR) && composer ezplatform-install
@@ -70,6 +72,7 @@ clean: ## Removes the vendors, and caches
 	@rm -f .php_cs.cache
 	@rm -rf vendor
 	@rm -rf ezplatform
+	@rm -rf node_modules
 	@rm -f composer.lock
 	@docker stop $(DOCKER_DB_CONTAINER)
 	@docker rm $(DOCKER_DB_CONTAINER)

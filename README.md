@@ -21,8 +21,7 @@ Add the following to your composer.json and run `php composer.phar update novact
 # composer.json
 
 "require": {
-    "novactive/ezalgoliasearchengine": "^1.0.0",
-    "algolia/algoliasearch-client-php": "^2.7"
+    "novactive/ezalgoliasearchengine": "^1.0.0"
 }
 ```
 

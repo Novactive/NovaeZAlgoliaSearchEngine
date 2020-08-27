@@ -1,8 +1,8 @@
-// import React from 'react';
-// import ReactDOM from 'react-dom';
-// import algoliasearch from 'algoliasearch/lite';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import algoliasearch from 'algoliasearch/lite';
 
-const {InstantSearch, SearchBox, Hits, Stats, HitsPerPage, connectPagination, SortBy, RefinementList} = ReactInstantSearchDOM;
+import {InstantSearch, SearchBox, Hits, Stats, HitsPerPage, connectPagination, SortBy, RefinementList} from 'react-instantsearch-dom';
 
 const NovaEzAlgoliaSearch = ({lang, replicas, config}) => {
 
