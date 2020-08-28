@@ -2,7 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import algoliasearch from 'algoliasearch/lite';
 
-import {InstantSearch, SearchBox, Hits, Stats, HitsPerPage, connectPagination, SortBy, RefinementList} from 'react-instantsearch-dom';
+import {
+    InstantSearch,
+    SearchBox,
+    Hits,
+    Stats,
+    HitsPerPage,
+    connectPagination,
+    SortBy,
+    RefinementList
+} from 'react-instantsearch-dom';
 
 const NovaEzAlgoliaSearch = ({lang, replicas, config}) => {
 
@@ -19,13 +28,14 @@ const NovaEzAlgoliaSearch = ({lang, replicas, config}) => {
         if (undefined === label) {
             label = replicasArray[key]['label']['eng-GB'];
         }
-        replicaNames.push({value: indexName+'-'+key, label: label});
+        replicaNames.push({value: indexName + '-' + key, label: label});
     }
 
     return <div>
         <h3>{lang}</h3>
         <InstantSearch searchClient={searchClient} indexName={indexName}>
             <table cellSpacing={'10px'}>
+                <tbody>
                 <tr>
                     <td>
                     </td>
@@ -69,12 +79,13 @@ const NovaEzAlgoliaSearch = ({lang, replicas, config}) => {
                         <CustomPagination/>
                     </td>
                 </tr>
+                </tbody>
             </table>
         </InstantSearch>
     </div>
 };
 
-const Hit = ({hit}) => <p>{hit.article_title_value_s}</p>;
+const Hit = ({hit}) => <p>{hit.content_name_s}</p>;
 
 const Pagination = ({currentRefinement, nbPages, refine, createURL}) => (
     <ul style={{paddingLeft: 0}}>
@@ -85,7 +96,7 @@ const Pagination = ({currentRefinement, nbPages, refine, createURL}) => (
             };
 
             return (
-                <li key={index} style={{'list-style-type': 'none', float: 'left', marginRight: '5px'}}>
+                <li key={index} style={{listStyleType: 'none', float: 'left', marginRight: '5px'}}>
                     <a
                         href={createURL(page)}
                         style={linkStyle}

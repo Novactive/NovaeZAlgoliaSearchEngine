@@ -33,7 +33,7 @@ final class LocationIndexCreateEvent extends Event
         $this->document = $document;
     }
 
-    public function getContent(): Location
+    public function getLocation(): Location
     {
         return $this->location;
     }

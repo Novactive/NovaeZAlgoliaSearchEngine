@@ -9,9 +9,9 @@
 
 declare(strict_types=1);
 
-namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core;
+namespace Novactive\Bundle\eZAlgoliaSearchEngine\Mapping;
 
-final class Query
+final class Parameters
 {
     public const SEARCH_ATTRIBUTES = [
         'content_id_i',
@@ -61,7 +61,8 @@ final class Query
     ];
 
     public const ATTRIBUTES_FOR_FACETING = [
-        'content_type_name_s'
+        'content_type_name_s',
+        'filterOnly(doc_type_s)'
     ];
 
     public const REPLICAS = [

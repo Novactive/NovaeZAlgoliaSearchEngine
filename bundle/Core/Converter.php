@@ -99,6 +99,12 @@ final class Converter
             new IntegerField()
         );
 
+        $baseDocument->fields[] = new Field(
+            'doc_type',
+            'content',
+            new StringField()
+        );
+
         $this->addContentInfoFields($baseDocument, $contentInfo);
         $this->addVersionInfoFields($baseDocument, $versionInfo);
         $this->addContentLocationFields($baseDocument, $content);
@@ -138,6 +144,12 @@ final class Converter
             'location_id',
             $location->id,
             new IntegerField()
+        );
+
+        $baseDocument->fields[] = new Field(
+            'doc_type',
+            'location',
+            new StringField()
         );
 
         $baseDocument->fields[] = new Field(

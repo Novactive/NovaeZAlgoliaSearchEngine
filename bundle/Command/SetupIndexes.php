@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Command;
 
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\AlgoliaClient;
-use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\Parameters;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -61,13 +61,13 @@ final class SetupIndexes extends Command
                 static function (string $suffix) use ($index) {
                     return "{$index->getIndexName()}-{$suffix}";
                 },
-                array_keys(Query::REPLICAS)
+                array_keys(Parameters::REPLICAS)
             );
 
             $index->setSettings(
                 [
-                    'searchableAttributes' => Query::SEARCH_ATTRIBUTES,
-                    'attributesForFaceting' => Query::ATTRIBUTES_FOR_FACETING,
+                    'searchableAttributes' => Parameters::SEARCH_ATTRIBUTES,
+                    'attributesForFaceting' => Parameters::ATTRIBUTES_FOR_FACETING,
                     'replicas' => $replicaNames,
                 ],
                 ['forwardToReplicas' => true]
@@ -75,7 +75,7 @@ final class SetupIndexes extends Command
 
             $io->section('Index '.$index->getIndexName().' created.');
 
-            foreach (Query::REPLICAS as $replicaSuffix => $attributes) {
+            foreach (Parameters::REPLICAS as $replicaSuffix => $attributes) {
                 $replica = $this->client->getIndex($language->languageCode, $replicaSuffix);
                 $io->writeln('replica '.$replica->getIndexName().' set');
                 $replica->setSettings(

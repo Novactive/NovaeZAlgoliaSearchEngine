@@ -5,7 +5,7 @@
     <h1>Algolia Search</h1>
 
     {% set lang = ezplatform.configResolver.getParameter('languages')[0] %}
-    {% set replicas = constant('Novactive\\Bundle\\eZAlgoliaSearchEngine\\Core\\Query::REPLICAS')|json_encode %}
+    {% set replicas = constant('Novactive\\Bundle\\eZAlgoliaSearchEngine\\Mapping\\Parameters::REPLICAS')|json_encode %}
     {% set algoliaConfig = constant('Novactive\\Bundle\\eZAlgoliaSearchEngine\\Core\\AlgoliaClient::CONFIG')|json_encode %}
 
     <div id="js-algolia-search-container" data-lang="{{ lang }}" data-replicas="{{ replicas }}" data-config="{{ algoliaConfig }}"></div>
