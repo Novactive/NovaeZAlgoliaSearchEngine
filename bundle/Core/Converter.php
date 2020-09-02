@@ -454,6 +454,12 @@ final class Converter
         );
 
         $document->fields[] = new Field(
+            'content_type_identifier',
+            $contentType->identifier,
+            new StringField()
+        );
+
+        $document->fields[] = new Field(
             'content_type_name',
             $contentType->name[$languageCode] ?? $contentType->name[array_key_first($contentType->name)],
             new StringField()
@@ -553,9 +559,21 @@ final class Converter
         );
 
         $document->fields[] = new Field(
+            'content_modification_date_timestamp',
+            $contentInfo->modificationDate,
+            new IntegerField()
+        );
+
+        $document->fields[] = new Field(
             'content_publication_date',
             $contentInfo->publicationDate,
             new DateField()
+        );
+
+        $document->fields[] = new Field(
+            'content_publication_date_timestamp',
+            $contentInfo->publicationDate,
+            new IntegerField()
         );
     }
 

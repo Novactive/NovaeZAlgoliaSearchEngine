@@ -49,7 +49,11 @@ final class FindLocations extends Command
         $io = new SymfonyStyle($input, $output);
 
         $query = new LocationQuery();
-        $query->filter = new Criterion\ContentTypeIdentifier('article');
+
+        //$query->filter = new Criterion\ContentTypeIdentifier('article');
+        //$query->filter = new Criterion\Location\Depth(Criterion\Operator::GT, 2);
+        $query->filter = new Criterion\Location\Priority(Criterion\Operator::LTE, 2);
+
         $query->query = new Criterion\MatchAll();
         $query->offset = 0;
         $query->limit = 10;

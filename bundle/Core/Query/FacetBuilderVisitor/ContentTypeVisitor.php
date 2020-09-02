@@ -23,6 +23,6 @@ final class ContentTypeVisitor extends AbstractTermsVisitor
 
     protected function getTargetField(FacetBuilder $builder): string
     {
-        return 'content_type_name_s';
+        return 'content_type_identifier_s';
     }
 }

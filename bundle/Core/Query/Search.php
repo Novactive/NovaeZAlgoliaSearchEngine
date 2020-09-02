@@ -17,6 +17,8 @@ use eZ\Publish\API\Repository\Values\Content\Search\SearchResult;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\AlgoliaClient;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\FacetBuilderVisitor\FacetBuilderVisitor;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\ResultExtractor\ResultExtractor;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\CriterionVisitor;
+use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 
 final class Search
 {
@@ -33,31 +35,44 @@ final class Search
     /**
      * @var FacetBuilderVisitor
      */
-    private $dispatcherVisitor;
+    private $dispatcherFacetVisitor;
+
+    /**
+     * @var CriterionVisitor
+     */
+    private $dispatcherCriterionVisitor;
 
     public function __construct(
         AlgoliaClient $client,
         ResultExtractor $resultExtractor,
-        FacetBuilderVisitor $dispatcherVisitor
+        FacetBuilderVisitor $dispatcherFacetVisitor,
+        CriterionVisitor $dispatcherCriterionVisitor
     ) {
         $this->client = $client;
         $this->resultExtractor = $resultExtractor;
-        $this->dispatcherVisitor = $dispatcherVisitor;
+        $this->dispatcherFacetVisitor = $dispatcherFacetVisitor;
+        $this->dispatcherCriterionVisitor = $dispatcherCriterionVisitor;
     }
 
     public function execute(Query $query, string $docType, array $languageFilter): SearchResult
     {
         $filters = "doc_type_s:{$docType}";
 
-        // test value
-        $filters .= ' AND content_id_i = 57';
+        if (null !== $query->filter) {
+            $filters .= ' AND '.$this->visitFilter($query->filter);
+            //$filters .= ' AND short_title_is_empty_b:true';
+        }
+
+        dump($filters);
 
         $requestOptions = [
             'filters' => $filters,
             'attributesToHighlight' => [],
             'offset' => 0,
             'length' => $query->limit,
-            'facets' => $this->visitFacetBuilder($query)
+            'facets' => $this->visitFacetBuilder($query),
+//            'aroundLatLng' => '37.7512306, -122.4584587',
+//            'aroundRadius' => 2000
         ];
 
         try {
@@ -74,9 +89,14 @@ final class Search
     {
         $facets = [];
         foreach ($query->facetBuilders as $facetBuilder) {
-            $facets[] = $this->dispatcherVisitor->visit($facetBuilder);
+            $facets[] = $this->dispatcherFacetVisitor->visit($facetBuilder);
         }
 
         return $facets;
+    }
+
+    private function visitFilter(Criterion $criterion): string
+    {
+        return $this->dispatcherCriterionVisitor->visit($this->dispatcherCriterionVisitor, $criterion);
     }
 }

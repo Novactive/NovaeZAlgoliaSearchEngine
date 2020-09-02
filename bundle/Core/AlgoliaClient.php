@@ -30,6 +30,7 @@ final class AlgoliaClient
     public function getIndex(string $languageCode, ?string $replicaSuffix = null): SearchIndex
     {
         $indexName = self::CONFIG['index_name'].'-'.$languageCode;
+
         if (null !== $replicaSuffix) {
             $indexName .= '-'.$replicaSuffix;
         }

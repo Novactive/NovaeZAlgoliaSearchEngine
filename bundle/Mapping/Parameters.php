@@ -19,6 +19,7 @@ final class Parameters
         'content_name_s',
         'content_type_id_i',
         'content_type_name_s',
+        'content_type_identifier_s',
         'content_type_group_id_mi',
         'content_owner_user_id_i',
         'content_owner_user_group_id_mi',
@@ -47,22 +48,14 @@ final class Parameters
         'meta_indexed_language_code_s',
         'meta_indexed_is_main_translation_b',
         'meta_indexed_is_main_translation_and_always_available_b',
-        'title_is_empty_b',
-        'article_title_value_s',
-        'article_title_fulltext_fulltext',
-        'short_title_is_empty_b',
-        'intro_is_empty_b',
-        'article_intro_value_s',
-        'article_intro_fulltext_fulltext',
-        'body_is_empty_b',
-        'article_body_value_s',
-        'article_body_fulltext_fulltext',
-        'image_is_empty_b'
     ];
 
     public const ATTRIBUTES_FOR_FACETING = [
-        'content_type_name_s',
-        'filterOnly(doc_type_s)'
+        'content_type_identifier_s',
+        'doc_type_s',
+        'filterOnly(location_path_string_mid)',
+        'filterOnly(section_identifier_id)',
+        'filterOnly(content_remote_id_id)'
     ];
 
     public const REPLICAS = [
