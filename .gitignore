@@ -4,3 +4,4 @@ vendor
 .php_cs.cache
 ezplatform
 node_modules
+.phpunit.result.cache

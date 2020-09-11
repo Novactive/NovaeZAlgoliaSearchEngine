@@ -61,7 +61,7 @@ codeclean: ## Coding Standard checks
 
 .PHONY: tests
 tests: ## Run the tests
-	$(PHP_BIN) ./vendor/bin/phpunit ./tests --exclude-group behat
+	DATABASE_URL="mysql://root:ezplatform@127.0.0.1:3355/ezplatform" $(PHP_BIN) ./vendor/bin/phpunit -c "tests" "tests"
 
 .PHONY: install
 install: ## Install vendors

@@ -85,7 +85,7 @@ final class Search
         }
     }
 
-    private function visitFacetBuilder(Query $query): array
+    public function visitFacetBuilder(Query $query): array
     {
         $facets = [];
         foreach ($query->facetBuilders as $facetBuilder) {
@@ -95,7 +95,7 @@ final class Search
         return $facets;
     }
 
-    private function visitFilter(Criterion $criterion): string
+    public function visitFilter(Criterion $criterion): string
     {
         return $this->dispatcherCriterionVisitor->visit($this->dispatcherCriterionVisitor, $criterion);
     }

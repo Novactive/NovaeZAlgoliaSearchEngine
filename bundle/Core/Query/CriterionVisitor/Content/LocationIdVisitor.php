@@ -16,7 +16,7 @@ use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\Criterion
 
 final class LocationIdVisitor implements CriterionVisitor
 {
-    private const INDEX_FIELD = 'main_location_i';
+    private const INDEX_FIELD = 'location_id_mi';
 
     public function supports(Criterion $criterion): bool
     {

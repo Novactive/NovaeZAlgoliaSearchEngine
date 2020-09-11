@@ -14,6 +14,7 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\Con
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\CriterionVisitor;
 use eZ\Publish\Core\Repository\Values\Content\Query\Criterion\PermissionSubtree;
+use RuntimeException;
 
 final class SubtreeVisitor implements CriterionVisitor
 {
@@ -27,16 +28,9 @@ final class SubtreeVisitor implements CriterionVisitor
 
     public function visit(CriterionVisitor $dispatcher, Criterion $criterion, string $additionalOperators = ''): string
     {
-        return '('.
-               implode(
-                   'NOT ' === $additionalOperators ? ' AND ' : ' OR ',
-                   array_map(
-                       static function ($value) use ($additionalOperators) {
-                           return $additionalOperators.self::INDEX_FIELD.':"'.$value.'"';
-                       },
-                       $criterion->value
-                   )
-               ).
-               ')';
+        $message = 'Subtree criterion is not implemented yet. ';
+        $message .= 'Check out the Algolia reference for the possible ways to implement it: ';
+        $message .= 'https://www.algolia.com/doc/api-reference/api-parameters/query/';
+        throw new RuntimeException($message);
     }
 }

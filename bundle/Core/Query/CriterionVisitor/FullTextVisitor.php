@@ -23,7 +23,7 @@ final class FullTextVisitor implements CriterionVisitor
 
     public function visit(CriterionVisitor $dispatcher, Criterion $criterion, string $additionalOperators = ''): string
     {
-        $message = 'FullText criterion is not implemented yet to use the Algolia search engine. ';
+        $message = 'FullText criterion is not implemented yet. ';
         $message .= 'Check out the Algolia reference for the possible ways to implement it: ';
         $message .= 'https://www.algolia.com/doc/api-reference/api-parameters/query/';
         throw new RuntimeException($message);

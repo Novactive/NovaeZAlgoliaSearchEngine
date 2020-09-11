@@ -50,9 +50,7 @@ final class FindLocations extends Command
 
         $query = new LocationQuery();
 
-        //$query->filter = new Criterion\ContentTypeIdentifier('article');
-        //$query->filter = new Criterion\Location\Depth(Criterion\Operator::GT, 2);
-        $query->filter = new Criterion\Location\Priority(Criterion\Operator::LTE, 2);
+        $query->filter = new Criterion\Visibility(Criterion\Visibility::VISIBLE);
 
         $query->query = new Criterion\MatchAll();
         $query->offset = 0;

@@ -16,7 +16,7 @@ use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\Criterion
 
 final class LocationRemoteIdVisitor implements CriterionVisitor
 {
-    private const INDEX_FIELD = 'main_location_remote_id_id';
+    private const INDEX_FIELD = 'location_remote_id_mid';
 
     public function supports(Criterion $criterion): bool
     {
@@ -29,7 +29,7 @@ final class LocationRemoteIdVisitor implements CriterionVisitor
                 'NOT ' === $additionalOperators ? ' AND ' : ' OR ',
                 array_map(
                     static function ($value) use ($additionalOperators) {
-                        return $additionalOperators.self::INDEX_FIELD.':'.$value;
+                        return $additionalOperators.self::INDEX_FIELD.':"'.$value.'"';
                     },
                     $criterion->value
                 )

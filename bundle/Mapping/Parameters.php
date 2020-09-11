@@ -54,8 +54,15 @@ final class Parameters
         'content_type_identifier_s',
         'doc_type_s',
         'filterOnly(location_path_string_mid)',
+        'filterOnly(location_remote_id_mid)',
         'filterOnly(section_identifier_id)',
-        'filterOnly(content_remote_id_id)'
+        'filterOnly(content_remote_id_id)',
+        'filterOnly(content_language_codes_ms)',
+        'filterOnly(location_visible_b)',
+        'filterOnly(is_main_location_b)',
+        'filterOnly(location_remote_id_id)',
+        'filterOnly(path_string_id)',
+        'filterOnly(invisible_b)'
     ];
 
     public const REPLICAS = [
