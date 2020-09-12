@@ -53,6 +53,11 @@ services:
         tags:
             - { name: ezplatform.search_engine, alias: algolia }
 
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\ClientService:
+        bind:
+            $contentSearch: '@ezplatform.search.algolia.query.content.search'
+            $locationSearch: '@ezplatform.search.algolia.query.location.search'
+
     Novactive\Bundle\eZAlgoliaSearchEngine\Core\Converter:
         arguments:
             $persistenceHandler: '@ezpublish.api.storage_engine'
@@ -73,6 +78,7 @@ services:
             $resultExtractor: '@Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\ResultExtractor\ContentResultsExtractor'
             $dispatcherFacetVisitor: '@ezplatform.search.algolia.query.content.facet_builder_visitor.dispatcher'
             $dispatcherCriterionVisitor: '@ezplatform.search.algolia.query.content.criterion_visitor.dispatcher'
+            $dispatcherSortClauseVisitor: '@ezplatform.search.algolia.query.sort_clause_visitor.dispatcher'
 
     ezplatform.search.algolia.query.location.search:
         class: Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\Search
@@ -80,6 +86,7 @@ services:
             $resultExtractor: '@Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\ResultExtractor\LocationResultsExtractor'
             $dispatcherFacetVisitor: '@ezplatform.search.algolia.query.location.facet_builder_visitor.dispatcher'
             $dispatcherCriterionVisitor: '@ezplatform.search.algolia.query.location.criterion_visitor.dispatcher'
+            $dispatcherSortClauseVisitor: '@ezplatform.search.algolia.query.sort_clause_visitor.dispatcher'
 
     # Visitors
 
@@ -140,6 +147,20 @@ services:
         class: Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\DispatcherVisitor
         arguments:
             $visitors: !tagged_iterator ezplatform.search.algolia.query.location.criterion_visitor
+
+    ## - Sort Clause Visitors
+
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\SortClauseVisitor\:
+        resource: '../../Core/Query/SortClauseVisitor'
+        tags:
+            - { name: ezplatform.search.algolia.query.sort_clause_visitor }
+
+    ### - Dispatchers
+
+    ezplatform.search.algolia.query.sort_clause_visitor.dispatcher:
+        class: Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\SortClauseVisitor\DispatcherVisitor
+        arguments:
+            $visitors: !tagged_iterator ezplatform.search.algolia.query.sort_clause_visitor
 
     # Extractors
 

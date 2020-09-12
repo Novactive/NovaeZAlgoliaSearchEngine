@@ -15,6 +15,7 @@ use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Query;
 use eZ\Publish\API\Repository\Values\Content\Query\FacetBuilder\ContentTypeFacetBuilder;
 use eZ\Publish\Core\Repository\Values\Content\Content;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\SortClause\Replica;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -52,12 +53,10 @@ final class FindContent extends Command
 
         $query = new Query();
 
-        $query->filter = new Criterion\Visibility(Criterion\Visibility::VISIBLE);
-
+        $query->filter = new Criterion\ContentTypeIdentifier('article');
         $query->query = new Criterion\MatchAll();
-        $query->offset = 0;
-        $query->limit = 10;
         $query->facetBuilders[] = new ContentTypeFacetBuilder(['name' => 'ContentType']);
+        $query->sortClauses = [new Replica('multi-sort-asc')];
 
         $result = $this->repository->getSearchService()->findContent($query);
 

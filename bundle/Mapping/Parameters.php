@@ -66,7 +66,23 @@ final class Parameters
     ];
 
     public const REPLICAS = [
-        'sort_by_content_name_asc' => [
+        'sort_by_content_id_i_asc' => [
+            'condition' => [
+                'asc(content_id_i)'
+            ],
+            'label' => [
+                'eng-GB' => 'Content Id Asc.'
+            ]
+        ],
+        'sort_by_content_id_i_desc' => [
+            'condition' => [
+                'desc(content_id_i)'
+            ],
+            'label' => [
+                'eng-GB' => 'Content Id Desc.'
+            ]
+        ],
+        'sort_by_content_name_s_asc' => [
             'condition' => [
                 'asc(content_name_s)'
             ],
@@ -74,7 +90,7 @@ final class Parameters
                 'eng-GB' => 'Content Name Asc.'
             ]
         ],
-        'sort_by_content_name_desc' => [
+        'sort_by_content_name_s_desc' => [
             'condition' => [
                 'desc(content_name_s)'
             ],
@@ -82,7 +98,7 @@ final class Parameters
                 'eng-GB' => 'Content Name Desc.'
             ]
         ],
-        'sort_by_publication_date_asc' => [
+        'sort_by_publication_date_dt_asc' => [
             'condition' => [
                 'asc(content_publication_date_dt)'
             ],
@@ -90,12 +106,60 @@ final class Parameters
                 'eng-GB' => 'Publication Date Asc.'
             ]
         ],
-        'sort_by_publication_date_desc' => [
+        'sort_by_publication_date_dt_desc' => [
             'condition' => [
                 'desc(content_publication_date_dt)'
             ],
             'label' => [
                 'eng-GB' => 'Publication Date Desc.'
+            ]
+        ],
+        'sort_by_modification_date_dt_asc' => [
+            'condition' => [
+                'asc(content_modification_date_dt)'
+            ],
+            'label' => [
+                'eng-GB' => 'Modification Date Asc.'
+            ]
+        ],
+        'sort_by_modification_date_dt_desc' => [
+            'condition' => [
+                'desc(content_modification_date_dt)'
+            ],
+            'label' => [
+                'eng-GB' => 'Modification Date Desc.'
+            ]
+        ],
+        'sort_by_section_identifier_id_asc' => [
+            'condition' => [
+                'asc(section_identifier_id)'
+            ],
+            'label' => [
+                'eng-GB' => 'Section Identifier Asc.'
+            ]
+        ],
+        'sort_by_section_identifier_id_desc' => [
+            'condition' => [
+                'desc(section_identifier_id)'
+            ],
+            'label' => [
+                'eng-GB' => 'Section Identifier Desc.'
+            ]
+        ],
+        'sort_by_section_name_s_asc' => [
+            'condition' => [
+                'asc(section_name_s)'
+            ],
+            'label' => [
+                'eng-GB' => 'Section Name Asc.'
+            ]
+        ],
+        'sort_by_section_name_s_desc' => [
+            'condition' => [
+                'desc(section_name_s)'
+            ],
+            'label' => [
+                'eng-GB' => 'Section Name Desc.'
             ]
         ],
     ];

@@ -14,6 +14,7 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core;
 use eZ\Publish\Core\Search\Common\FieldNameGenerator;
 use eZ\Publish\Core\Search\Common\FieldValueMapper;
 use eZ\Publish\SPI\Search\Document;
+use eZ\Publish\SPI\Search\FieldType\GeoLocationField;
 
 final class DocumentSerializer
 {
@@ -36,6 +37,7 @@ final class DocumentSerializer
     public function serialize(Document $document): array
     {
         $body = [];
+        $geolocFields = [];
         foreach ($document->fields as $field) {
             $fieldName = $this->nameGenerator->getTypedName($field->name, $field->type);
             if ($this->fieldValueMapper->canMap($field)) {
@@ -45,6 +47,17 @@ final class DocumentSerializer
             }
 
             $body[$fieldName] = $fieldValue;
+
+            if ($field->type instanceof GeoLocationField &&
+                null !== $field->value['latitude'] && null !== $field->value['longitude']) {
+                $geolocFields[] = [
+                    'lat' => $field->value['latitude'],
+                    'lng' => $field->value['longitude']
+                ];
+            }
+        }
+        if (count($geolocFields) > 0) {
+            $body['_geoloc'] = $geolocFields;
         }
 
         return $body;

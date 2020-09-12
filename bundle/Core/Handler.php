@@ -87,7 +87,7 @@ class Handler extends LegacyHandler
         foreach ($this->converter->convertContent($content) as $document) {
             $array = $this->documentSerializer->serialize($document);
             $array['objectID'] = $document->id;
-            $this->client->getIndex($array['meta_indexed_language_code_s'])->saveObjects([$array]);
+            $this->reindex($array['meta_indexed_language_code_s'], [$array]);
         }
 
         parent::indexContent($content);
@@ -98,10 +98,15 @@ class Handler extends LegacyHandler
         foreach ($this->converter->convertLocation($location) as $document) {
             $array = $this->documentSerializer->serialize($document);
             $array['objectID'] = $document->id;
-            $this->client->getIndex($array['meta_indexed_language_code_s'])->saveObjects([$array]);
+            $this->reindex($array['meta_indexed_language_code_s'], [$array]);
         }
 
         parent::indexLocation($location);
+    }
+
+    public function reindex(string $languageCode, array $objects): void
+    {
+        $this->client->getIndex($languageCode)->saveObjects($objects);
     }
 
     public function deleteContent($contentId, $versionId = null): void
@@ -166,13 +171,13 @@ class Handler extends LegacyHandler
 
     public function findLocations(LocationQuery $query, array $languageFilter = []): SearchResult
     {
-        if (!isset($languageFilter['languages'])) {
-            $languageFilter['languages'] = ['eng-GB'];
-        }
-
-        return $this->locationSearchService->execute($query, 'location', $languageFilter);
+//        if (!isset($languageFilter['languages'])) {
+//            $languageFilter['languages'] = ['eng-GB'];
+//        }
+//
+//        return $this->locationSearchService->execute($query, 'location', $languageFilter);
 
         //@todo: should be replaced eventually
-        //return parent::findLocations($query, $languageFilter);
+        return parent::findLocations($query, $languageFilter);
     }
 }
