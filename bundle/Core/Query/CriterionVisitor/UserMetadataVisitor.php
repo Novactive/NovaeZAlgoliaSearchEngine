@@ -13,9 +13,12 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor;
 
 use eZ\Publish\API\Repository\Exceptions\NotImplementedException;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\Contracts\CommonVisitor;
 
 final class UserMetadataVisitor implements CriterionVisitor
 {
+    use CommonVisitor;
+
     public function supports(Criterion $criterion): bool
     {
         return $criterion instanceof Criterion\UserMetadata &&
@@ -31,19 +34,7 @@ final class UserMetadataVisitor implements CriterionVisitor
 
     public function visit(CriterionVisitor $dispatcher, Criterion $criterion, string $additionalOperators = ''): string
     {
-        $fieldName = $this->getTargetField($criterion);
-
-        return '('.
-               implode(
-                   'NOT ' === $additionalOperators ? ' AND ' : ' OR ',
-                   array_map(
-                       static function ($value) use ($fieldName, $additionalOperators) {
-                           return $additionalOperators.$fieldName.'='.$value;
-                       },
-                       $criterion->value
-                   )
-               ).
-               ')';
+        return $this->visitWithOperators($criterion, $additionalOperators, $this->getTargetField($criterion));
     }
 
     private function getTargetField(Criterion $criterion): string

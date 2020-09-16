@@ -22,7 +22,7 @@ trait Helper
                 return sprintf('%F', $value);
 
             default:
-                return (string) $value;
+                return (string)$value;
         }
     }
 

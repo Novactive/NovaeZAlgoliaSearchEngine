@@ -18,8 +18,6 @@ use RuntimeException;
 
 final class SubtreeVisitor implements CriterionVisitor
 {
-    private const INDEX_FIELD = 'location_path_string_mid';
-
     public function supports(Criterion $criterion): bool
     {
         return ($criterion instanceof Criterion\Subtree || $criterion instanceof PermissionSubtree) &&

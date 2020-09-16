@@ -239,7 +239,7 @@ class CriterionTest extends WebTestCase
         $query = new Query();
         $query->filter = $criterion;
 
-        $this->assertEquals($expectedValue, $searchService->visitFilter($criterion));
+        self::assertEquals($expectedValue, $searchService->visitFilter($criterion));
     }
 
     /**
@@ -253,6 +253,6 @@ class CriterionTest extends WebTestCase
         $query = new LocationQuery();
         $query->filter = $criterion;
 
-        $this->assertEquals($expectedValue, $searchService->visitFilter($criterion));
+        self::assertEquals($expectedValue, $searchService->visitFilter($criterion));
     }
 }

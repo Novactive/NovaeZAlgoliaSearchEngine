@@ -12,9 +12,12 @@ declare(strict_types=1);
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor;
 
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\Contracts\CommonVisitor;
 
 final class RemoteIdVisitor implements CriterionVisitor
 {
+    use CommonVisitor;
+
     private const INDEX_FIELD = 'content_remote_id_id';
 
     public function supports(Criterion $criterion): bool
@@ -24,16 +27,6 @@ final class RemoteIdVisitor implements CriterionVisitor
 
     public function visit(CriterionVisitor $dispatcher, Criterion $criterion, string $additionalOperators = ''): string
     {
-        return '('.
-               implode(
-                   'NOT ' === $additionalOperators ? ' AND ' : ' OR ',
-                   array_map(
-                       static function ($value) use ($additionalOperators) {
-                           return $additionalOperators.self::INDEX_FIELD.':"'.$value.'"';
-                       },
-                       $criterion->value
-                   )
-               ).
-               ')';
+        return $this->visitValues($criterion->value, self::INDEX_FIELD . ':"%s"', $additionalOperators);
     }
 }
