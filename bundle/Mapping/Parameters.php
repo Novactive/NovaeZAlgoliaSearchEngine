@@ -37,6 +37,8 @@ final class Parameters
         'location_parent_id_mi',
         'location_remote_id_mid',
         'location_path_string_mid',
+        'location_ancestors_path_string_ms',
+        'path_string_id',
         'main_location_i',
         'main_location_parent_i',
         'main_location_remote_id_id',
@@ -53,7 +55,6 @@ final class Parameters
     public const ATTRIBUTES_FOR_FACETING = [
         'content_type_identifier_s',
         'doc_type_s',
-        'filterOnly(location_path_string_mid)',
         'filterOnly(location_remote_id_mid)',
         'filterOnly(section_identifier_id)',
         'filterOnly(content_remote_id_id)',
@@ -61,8 +62,9 @@ final class Parameters
         'filterOnly(location_visible_b)',
         'filterOnly(is_main_location_b)',
         'filterOnly(location_remote_id_id)',
-        'filterOnly(path_string_id)',
-        'filterOnly(invisible_b)'
+        'filterOnly(invisible_b)',
+        'filterOnly(ancestors_path_string_mid)',
+        'filterOnly(location_ancestors_path_string_mid)',
     ];
 
     public const REPLICAS = [

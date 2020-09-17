@@ -69,6 +69,9 @@ final class Search
         if (null !== $query->filter) {
             $filters .= ' AND '.$this->visitFilter($query->filter);
         }
+        if (null !== $query->query) {
+            $filters .= ' AND '.$this->visitFilter($query->query);
+        }
 
         $requestOptions = [
             'filters' => $filters,
@@ -123,10 +126,14 @@ final class Search
         return $this->dispatcherCriterionVisitor->visit($this->dispatcherCriterionVisitor, $criterion);
     }
 
-    private function visitSortClauses(array $sortClauses): string
+    private function visitSortClauses(array $sortClauses): ?string
     {
         if (count($sortClauses) > 1) {
             throw new RuntimeException('Only one Sort Clause cab be used to select the sorting replica.');
+        }
+
+        if (count($sortClauses) === 0) {
+            return null;
         }
 
         return $this->dispatcherSortClauseVisitor->visit(

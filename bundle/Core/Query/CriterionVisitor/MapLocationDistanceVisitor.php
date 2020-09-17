@@ -14,18 +14,19 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor;
 use eZ\Publish\API\Repository\Exceptions\NotImplementedException;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 
-final class FullTextVisitor implements CriterionVisitor
+final class MapLocationDistanceVisitor implements CriterionVisitor
 {
     public function supports(Criterion $criterion): bool
     {
-        return $criterion instanceof Criterion\FullText;
+        return $criterion instanceof Criterion\MapLocationDistance;
     }
 
     public function visit(CriterionVisitor $dispatcher, Criterion $criterion, string $additionalOperators = ''): string
     {
-        $message = 'FullText criterion is not implemented yet. ';
+        $message = 'MapLocationDistance criterion is not implemented yet. ';
         $message .= 'Check out the Algolia reference for the possible ways to implement it: ';
-        $message .= 'https://www.algolia.com/doc/api-reference/api-parameters/query/';
+        $message .= 'https://www.algolia.com/doc/guides/managing-results/refine-results/';
+        $message .= 'geolocation/how-to/filter-results-around-a-location/';
         throw new NotImplementedException($message);
     }
 }

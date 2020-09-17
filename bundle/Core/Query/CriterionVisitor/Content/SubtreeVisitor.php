@@ -12,23 +12,23 @@ declare(strict_types=1);
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\Content;
 
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\Contracts\CommonVisitor;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\CriterionVisitor;
 use eZ\Publish\Core\Repository\Values\Content\Query\Criterion\PermissionSubtree;
-use RuntimeException;
 
 final class SubtreeVisitor implements CriterionVisitor
 {
+    use CommonVisitor;
+
+    private const INDEX_FIELD = 'location_ancestors_path_string_mid';
+
     public function supports(Criterion $criterion): bool
     {
-        return ($criterion instanceof Criterion\Subtree || $criterion instanceof PermissionSubtree) &&
-               ($criterion->operator === Criterion\Operator::EQ || $criterion->operator === Criterion\Operator::IN);
+        return $criterion instanceof Criterion\Subtree || $criterion instanceof PermissionSubtree;
     }
 
     public function visit(CriterionVisitor $dispatcher, Criterion $criterion, string $additionalOperators = ''): string
     {
-        $message = 'Subtree criterion is not implemented yet. ';
-        $message .= 'Check out the Algolia reference for the possible ways to implement it: ';
-        $message .= 'https://www.algolia.com/doc/api-reference/api-parameters/query/';
-        throw new RuntimeException($message);
+        return $this->visitValues($criterion->value, self::INDEX_FIELD . ':"%s"', $additionalOperators);
     }
 }

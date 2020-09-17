@@ -16,10 +16,10 @@ use eZ\Publish\API\Repository\Values\Content\LocationQuery;
 use eZ\Publish\API\Repository\Values\Content\Query;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 use eZ\Publish\API\Repository\Values\Content\Search\SearchResult;
+use eZ\Publish\API\Repository\Values\ValueObject;
 use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
 use eZ\Publish\Core\Base\Exceptions\NotFoundException;
 use eZ\Publish\SPI\Persistence\Content;
-use eZ\Publish\SPI\Persistence\Content\ContentInfo;
 use eZ\Publish\SPI\Persistence\Content\Location;
 use eZ\Publish\Core\Search\Legacy\Content\Handler as LegacyHandler;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\Search;
@@ -140,7 +140,7 @@ class Handler extends LegacyHandler
         parent::purgeIndex();
     }
 
-    public function findSingle(Criterion $filter, array $languageFilter = []): ContentInfo
+    public function findSingle(Criterion $filter, array $languageFilter = []): ValueObject
     {
         $query = new Query();
         $query->filter = $filter;

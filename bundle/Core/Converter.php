@@ -78,7 +78,8 @@ final class Converter
         FieldTypeRegistry $fieldTypeRegistry,
         EventDispatcherInterface $eventDispatcher,
         DocumentIdGenerator $documentIdGenerator
-    ) {
+    )
+    {
         $this->persistenceHandler = $persistenceHandler;
         $this->fieldRegistry = $fieldRegistry;
         $this->fieldNameGenerator = $fieldNameGenerator;
@@ -174,6 +175,17 @@ final class Converter
             'path_string',
             $location->pathString,
             new IdentifierField()
+        );
+
+        // Creating the Array of the paths of all the Ancestors of this Location
+        // Used in Subtree Visitor
+        $baseDocument->fields[] = new Field(
+            'ancestors_path_string',
+            array_map(static function ($item) use (&$path) {
+                $path = $path ?: '/';
+                return $path .= $item . '/';
+            }, array_filter(explode('/', $location->pathString))),
+            new MultipleIdentifierField()
         );
 
         $baseDocument->fields[] = new Field(
@@ -318,6 +330,24 @@ final class Converter
                 $locationData['path_strings'],
                 new MultipleIdentifierField()
             );
+
+            // Creating the Array of the paths of all the Ancestors of this Content's locations
+            // Used in Subtree Visitor
+            $paths = [];
+            foreach ($locationData['path_strings'] as $pathString) {
+                $path = '/';
+                foreach (array_filter(explode('/', $pathString)) as $item) {
+                    $path .= $item . '/';
+                    if (!\in_array($path, $paths, true)) {
+                        $paths[] = $path;
+                    }
+                }
+            }
+            $document->fields[] = new Field(
+                'location_ancestors_path_string',
+                $paths,
+                new MultipleIdentifierField()
+            );
         }
 
         if ($mainLocation !== null) {
@@ -375,7 +405,8 @@ final class Converter
         Document $document,
         ContentInfo $contentInfo,
         string $languageCode
-    ): void {
+    ): void
+    {
         $isMainTranslation = $languageCode === $contentInfo->mainLanguageCode;
 
         $document->fields[] = new Field(

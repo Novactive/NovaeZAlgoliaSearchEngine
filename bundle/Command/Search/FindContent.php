@@ -15,7 +15,6 @@ use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Query;
 use eZ\Publish\API\Repository\Values\Content\Query\FacetBuilder\ContentTypeFacetBuilder;
 use eZ\Publish\Core\Repository\Values\Content\Content;
-use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\SortClause\Replica;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -53,10 +52,9 @@ final class FindContent extends Command
 
         $query = new Query();
 
-        $query->filter = new Criterion\ContentTypeIdentifier('article');
-        $query->query = new Criterion\MatchAll();
+        $query->filter = new Criterion\Subtree('/1/2/42/57/');
         $query->facetBuilders[] = new ContentTypeFacetBuilder(['name' => 'ContentType']);
-        $query->sortClauses = [new Replica('multi-sort-asc')];
+        $query->sortClauses = [new Query\SortClause\ContentId()];
 
         $result = $this->repository->getSearchService()->findContent($query);
 
@@ -74,7 +72,7 @@ final class FindContent extends Command
 
             /* @var Facet $facet */
             foreach ($result->facets as $facet) {
-                $io->section('Facet - '.$facet->name.':');
+                $io->section('Facet - ' . $facet->name . ':');
                 if (isset($facet->entries)) {
                     foreach ($facet->entries as $facetEntry => $number) {
                         $output->writeln("{$facetEntry} => {$number}");
