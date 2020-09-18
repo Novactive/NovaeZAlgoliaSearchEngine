@@ -36,6 +36,13 @@ final class LogicalNotVisitor implements CriterionVisitor
             throw new RuntimeException('AND operator cannot be inside LogicalNot criterion. '.$docRef);
         }
 
+        if ($criterion->criteria[0] instanceof Criterion\FullText) {
+            throw new RuntimeException(
+                "FullText Criterion cannot be inside LogicalNot operator ".
+                "because it's moved to the query string of the Algolia request which is performed anyway."
+            );
+        }
+
         return $dispatcher->visit($dispatcher, $criterion->criteria[0], 'NOT ');
     }
 }

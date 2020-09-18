@@ -13,6 +13,7 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core;
 
 use Doctrine\DBAL\Connection;
 use Exception;
+use eZ\Publish\API\Repository\LanguageService;
 use eZ\Publish\Core\Search\Common\IncrementalIndexer;
 use eZ\Publish\SPI\Persistence\Content\ContentInfo;
 use eZ\Publish\SPI\Persistence\Handler as PersistenceHandler;
@@ -37,6 +38,11 @@ class Indexer extends IncrementalIndexer
      */
     private $documentSerializer;
 
+    /**
+     * @var LanguageService
+     */
+    private $languageService;
+
     public function __construct(
         LoggerInterface $logger,
         PersistenceHandler $persistenceHandler,
@@ -44,12 +50,14 @@ class Indexer extends IncrementalIndexer
         SearchHandler $searchHandler,
         Handler $handler,
         Converter $converter,
-        DocumentSerializer $documentSerializer
+        DocumentSerializer $documentSerializer,
+        LanguageService $languageService
     ) {
         parent::__construct($logger, $persistenceHandler, $connection, $searchHandler);
         $this->handler = $handler;
         $this->converter = $converter;
         $this->documentSerializer = $documentSerializer;
+        $this->languageService = $languageService;
     }
 
     public function getName(): string
@@ -99,10 +107,22 @@ class Indexer extends IncrementalIndexer
 
     private function convertDocuments(iterator $documents, &$langObjectSet): void
     {
+        $contentLanguages = $mainTranslation = [];
         foreach ($documents as $document) {
-            $array = $this->documentSerializer->serialize($document);
-            $array['objectID'] = $document->id;
-            $langObjectSet[$array['meta_indexed_language_code_s']][] = $array;
+            $serialized = $this->documentSerializer->serialize($document);
+            $serialized['objectID'] = $document->id;
+            $langObjectSet[$serialized['meta_indexed_language_code_s']][] = $serialized;
+            $contentLanguages[] = $serialized['meta_indexed_language_code_s'];
+            if ($document->isMainTranslation) {
+                $mainTranslation = $serialized;
+            }
+        }
+
+
+        foreach ($this->languageService->loadLanguages() as $language) {
+            if (!in_array($language->languageCode, $contentLanguages, true)) {
+                $langObjectSet[$language->languageCode][] = $mainTranslation;
+            }
         }
     }
 }

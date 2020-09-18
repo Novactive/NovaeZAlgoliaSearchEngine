@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Command\Search;
 
-use eZ\Publish\API\Repository\Values\Content\Search\Facet;
 use eZ\Publish\Core\Repository\Values\Content\Content;
 use eZ\Publish\Core\Repository\Values\Content\Location;
 use eZ\Publish\SPI\Persistence\Content\ContentInfo;
@@ -106,7 +105,6 @@ final class CustomRequest extends Command
             }
             $this->io->newLine();
 
-            /* @var Facet $facet */
             foreach ($result->facets as $facet) {
                 $this->io->section('Facet - '.$facet->name.':');
                 if (isset($facet->entries)) {
@@ -143,10 +141,11 @@ final class CustomRequest extends Command
     private function rawSearch(): void
     {
         $requestOptions = [
-            'filters' => 'short_title_is_empty_b:false',
+            'filters' => 'doc_type_s:content AND short_title_is_empty_b:false',
             'attributesToHighlight' => [],
             'offset' => 0,
-            'length' => 3,
+            'length' => 10,
+            'attributesToRetrieve' => ['*']
         ];
 
         $result = $this->clientService->rawSearch('eng-GB', null, '', $requestOptions);

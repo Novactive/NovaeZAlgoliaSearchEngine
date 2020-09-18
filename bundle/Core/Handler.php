@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core;
 
+use Exception;
 use eZ\Publish\API\Repository\LanguageService;
 use eZ\Publish\API\Repository\Values\Content\LocationQuery;
 use eZ\Publish\API\Repository\Values\Content\Query;
@@ -23,6 +24,7 @@ use eZ\Publish\SPI\Persistence\Content;
 use eZ\Publish\SPI\Persistence\Content\Location;
 use eZ\Publish\Core\Search\Legacy\Content\Handler as LegacyHandler;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\Search;
+use Psr\Log\LoggerInterface;
 
 class Handler extends LegacyHandler
 {
@@ -62,6 +64,11 @@ class Handler extends LegacyHandler
     private $locationSearchService;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @required
      */
     public function setServices(
@@ -71,7 +78,8 @@ class Handler extends LegacyHandler
         LanguageService $languageService,
         DocumentIdGenerator $documentIdGenerator,
         Search $contentSearch,
-        Search $locationSearch
+        Search $locationSearch,
+        LoggerInterface $logger
     ): void {
         $this->client = $client;
         $this->converter = $converter;
@@ -80,14 +88,30 @@ class Handler extends LegacyHandler
         $this->documentIdGenerator = $documentIdGenerator;
         $this->contentSearchService = $contentSearch;
         $this->locationSearchService = $locationSearch;
+        $this->logger = $logger;
     }
 
     public function indexContent(Content $content): void
     {
-        foreach ($this->converter->convertContent($content) as $document) {
-            $array = $this->documentSerializer->serialize($document);
-            $array['objectID'] = $document->id;
-            $this->reindex($array['meta_indexed_language_code_s'], [$array]);
+        try {
+            $contentLanguages = $mainTranslation = [];
+            foreach ($this->converter->convertContent($content) as $document) {
+                $serialized = $this->documentSerializer->serialize($document);
+                $serialized['objectID'] = $document->id;
+                $this->reindex($serialized['meta_indexed_language_code_s'], [$serialized]);
+                $contentLanguages[] = $serialized['meta_indexed_language_code_s'];
+                if ($document->isMainTranslation) {
+                    $mainTranslation = $serialized;
+                }
+            }
+
+            foreach ($this->languageService->loadLanguages() as $language) {
+                if (!in_array($language->languageCode, $contentLanguages, true)) {
+                    $this->reindex($language->languageCode, [$mainTranslation]);
+                }
+            }
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage());
         }
 
         parent::indexContent($content);
@@ -95,10 +119,25 @@ class Handler extends LegacyHandler
 
     public function indexLocation(Location $location): void
     {
-        foreach ($this->converter->convertLocation($location) as $document) {
-            $array = $this->documentSerializer->serialize($document);
-            $array['objectID'] = $document->id;
-            $this->reindex($array['meta_indexed_language_code_s'], [$array]);
+        try {
+            $locationLanguages = $mainTranslation = [];
+            foreach ($this->converter->convertLocation($location) as $document) {
+                $serialized = $this->documentSerializer->serialize($document);
+                $serialized['objectID'] = $document->id;
+                $this->reindex($serialized['meta_indexed_language_code_s'], [$serialized]);
+                $locationLanguages[] = $serialized['meta_indexed_language_code_s'];
+                if ($document->isMainTranslation) {
+                    $mainTranslation = $serialized;
+                }
+            }
+
+            foreach ($this->languageService->loadLanguages() as $language) {
+                if (!in_array($language->languageCode, $locationLanguages, true)) {
+                    $this->reindex($language->languageCode, [$mainTranslation]);
+                }
+            }
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage());
         }
 
         parent::indexLocation($location);
@@ -148,14 +187,23 @@ class Handler extends LegacyHandler
         $query->offset = 0;
         $query->limit = 1;
 
-        $result = $this->contentSearchService->execute($query, 'content', $languageFilter);
+        try {
+            $result = $this->contentSearchService->execute($query, 'content', $languageFilter);
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage());
+
+            return parent::findSingle($filter, $languageFilter);
+        }
 
         if ($result->totalCount < 1) {
             throw new NotFoundException('Content', 'findSingle() found no content for the given $filter');
         }
 
         if ($result->totalCount > 1) {
-            throw new InvalidArgumentException('totalCount', 'findSingle() found more then one Content item for the given $filter');
+            throw new InvalidArgumentException(
+                'totalCount',
+                'findSingle() found more then one Content item for the given $filter'
+            );
         }
 
         return reset($result->searchHits)->valueObject;
@@ -163,21 +211,27 @@ class Handler extends LegacyHandler
 
     public function findContent(Query $query, array $languageFilter = []): SearchResult
     {
-        return $this->contentSearchService->execute($query, 'content', $languageFilter);
+        try {
+            return $this->contentSearchService->execute($query, 'content', $languageFilter);
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage());
 
-        //@todo: should be replaced eventually
-        //return parent::findContent($query, $languageFilter);
+            return parent::findContent($query, $languageFilter);
+        }
     }
 
     public function findLocations(LocationQuery $query, array $languageFilter = []): SearchResult
     {
-//        if (!isset($languageFilter['languages'])) {
-//            $languageFilter['languages'] = ['eng-GB'];
-//        }
-//
-//        return $this->locationSearchService->execute($query, 'location', $languageFilter);
+        if (!isset($languageFilter['languages'])) {
+            $languageFilter['languages'] = ['eng-GB'];
+        }
 
-        //@todo: should be replaced eventually
-        return parent::findLocations($query, $languageFilter);
+        try {
+            return $this->locationSearchService->execute($query, 'location', $languageFilter);
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage());
+
+            return parent::findLocations($query, $languageFilter);
+        }
     }
 }

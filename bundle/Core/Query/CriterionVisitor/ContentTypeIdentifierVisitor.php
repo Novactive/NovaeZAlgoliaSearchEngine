@@ -15,7 +15,6 @@ use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion\ContentTypeIdentifier;
 use eZ\Publish\SPI\Persistence\Content\Type\Handler;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\Contracts\CommonVisitor;
-use Psr\Log\NullLogger;
 
 final class ContentTypeIdentifierVisitor implements CriterionVisitor
 {

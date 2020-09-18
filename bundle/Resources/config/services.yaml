@@ -19,11 +19,6 @@ services:
         bind:
             $persistenceHandler: '@ezpublish.api.storage_engine'
 
-    Novactive\Bundle\eZAlgoliaSearchEngine\Command\SetupIndexes:
-        bind:
-            $fieldNameGenerator: '@ezpublish.search.common.field_name_generator'
-            $fieldRegistry: '@ezpublish.search.common.field_registry'
-
     Novactive\Bundle\eZAlgoliaSearchEngine\Core\:
         resource: '../../Core'
 
@@ -41,6 +36,7 @@ services:
         bind:
             $contentSearch: '@ezplatform.search.algolia.query.content.search'
             $locationSearch: '@ezplatform.search.algolia.query.location.search'
+            $logger: '@logger'
         arguments:
             $gateway: '@ezpublish.search.legacy.gateway.content'
             $locationGateway: '@ezpublish.search.legacy.gateway.location'
@@ -57,6 +53,12 @@ services:
         bind:
             $contentSearch: '@ezplatform.search.algolia.query.content.search'
             $locationSearch: '@ezplatform.search.algolia.query.location.search'
+
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\AttributeGenerator:
+        bind:
+            $fieldNameGenerator: '@ezpublish.search.common.field_name_generator'
+            $fieldRegistry: '@ezpublish.search.common.field_registry'
+            $fieldTypeRegistry: '@ezpublish.persistence.field_type_registry'
 
     Novactive\Bundle\eZAlgoliaSearchEngine\Core\Converter:
         arguments:

@@ -11,11 +11,12 @@ declare(strict_types=1);
 
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor;
 
-use eZ\Publish\API\Repository\Exceptions\NotImplementedException;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 
 final class FullTextVisitor implements CriterionVisitor
 {
+    public const placeholder = 'fulltextRequest={%s}';
+
     public function supports(Criterion $criterion): bool
     {
         return $criterion instanceof Criterion\FullText;
@@ -23,9 +24,6 @@ final class FullTextVisitor implements CriterionVisitor
 
     public function visit(CriterionVisitor $dispatcher, Criterion $criterion, string $additionalOperators = ''): string
     {
-        $message = 'FullText criterion is not implemented yet. ';
-        $message .= 'Check out the Algolia reference for the possible ways to implement it: ';
-        $message .= 'https://www.algolia.com/doc/api-reference/api-parameters/query/';
-        throw new NotImplementedException($message);
+        return sprintf(self::placeholder, $criterion->value);
     }
 }

@@ -37,6 +37,12 @@ final class LogicalOrVisitor implements CriterionVisitor
                     $docRef .= 'https://www.algolia.com/doc/api-reference/api-parameters/filters/#boolean-operators';
                     throw new RuntimeException('AND/OR operator cannot be inside LogicalOr criterion. '.$docRef);
                 }
+                if ($value instanceof Criterion\FullText) {
+                    throw new RuntimeException(
+                        "FullText Criterion cannot be inside LogicalOr operator ".
+                        "because it's moved to the query string of the Algolia request which is performed anyway."
+                    );
+                }
 
                 return $dispatcher->visit($dispatcher, $value, $additionalOperators);
             },

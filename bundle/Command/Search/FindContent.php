@@ -20,7 +20,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
-use eZ\Publish\API\Repository\Values\Content\Search\Facet;
 
 final class FindContent extends Command
 {
@@ -52,9 +51,10 @@ final class FindContent extends Command
 
         $query = new Query();
 
-        $query->filter = new Criterion\Subtree('/1/2/42/57/');
+        $query->filter = new Criterion\ContentTypeIdentifier('article');
+
         $query->facetBuilders[] = new ContentTypeFacetBuilder(['name' => 'ContentType']);
-        $query->sortClauses = [new Query\SortClause\ContentId()];
+        //$query->sortClauses = [new Query\SortClause\ContentId()];
 
         $result = $this->repository->getSearchService()->findContent($query);
 
@@ -66,13 +66,12 @@ final class FindContent extends Command
             foreach ($result->searchHits as $searchHit) {
                 /* @var Content $content */
                 $content = $searchHit->valueObject;
-                $output->writeln($content->getName());
+                $output->writeln($content->getFieldValue('title'));
             }
             $io->newLine();
 
-            /* @var Facet $facet */
             foreach ($result->facets as $facet) {
-                $io->section('Facet - ' . $facet->name . ':');
+                $io->section('Facet - '.$facet->name.':');
                 if (isset($facet->entries)) {
                     foreach ($facet->entries as $facetEntry => $number) {
                         $output->writeln("{$facetEntry} => {$number}");

@@ -21,10 +21,14 @@ abstract class AbstractResultsExtractor implements ResultExtractor
 {
     public const MATCHED_TRANSLATION_FIELD = 'meta_indexed_language_code_s';
 
-    /** @var FacetResultExtractor */
+    /**
+     * @var FacetResultExtractor
+     */
     private $dispatcherResultExtractor;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     private $skipMissingValueObject;
 
     public function __construct(FacetResultExtractor $dispatcherResultExtractor, bool $skipMissingValueObject = true)

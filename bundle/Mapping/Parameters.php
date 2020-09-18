@@ -164,5 +164,101 @@ final class Parameters
                 'eng-GB' => 'Section Name Desc.'
             ]
         ],
+        'sort_by_priority_i_asc' => [
+            'condition' => [
+                'asc(priority_i)'
+            ],
+            'label' => [
+                'eng-GB' => 'Priority Asc.'
+            ]
+        ],
+        'sort_by_priority_i_desc' => [
+            'condition' => [
+                'desc(priority_i)'
+            ],
+            'label' => [
+                'eng-GB' => 'Priority Desc.'
+            ]
+        ],
+        'sort_by_depth_i_asc' => [
+            'condition' => [
+                'asc(depth_i)'
+            ],
+            'label' => [
+                'eng-GB' => 'Depth Asc.'
+            ]
+        ],
+        'sort_by_depth_i_desc' => [
+            'condition' => [
+                'desc(depth_i)'
+            ],
+            'label' => [
+                'eng-GB' => 'Depth Desc.'
+            ]
+        ],
+        'sort_by_location_id_i_asc' => [
+            'condition' => [
+                'asc(location_id_i)'
+            ],
+            'label' => [
+                'eng-GB' => 'Location Id Asc.'
+            ]
+        ],
+        'sort_by_location_id_i_desc' => [
+            'condition' => [
+                'desc(location_id_i)'
+            ],
+            'label' => [
+                'eng-GB' => 'Location Id Desc.'
+            ]
+        ],
+        'sort_by_is_main_location_b_asc' => [
+            'condition' => [
+                'asc(is_main_location_b)'
+            ],
+            'label' => [
+                'eng-GB' => 'Is Main Location Asc.'
+            ]
+        ],
+        'sort_by_is_main_location_b_desc' => [
+            'condition' => [
+                'desc(is_main_location_b)'
+            ],
+            'label' => [
+                'eng-GB' => 'Is Main Location Desc.'
+            ]
+        ],
+        'sort_by_path_string_id_asc' => [
+            'condition' => [
+                'asc(path_string_id)'
+            ],
+            'label' => [
+                'eng-GB' => 'Path Asc.'
+            ]
+        ],
+        'sort_by_path_string_id_desc' => [
+            'condition' => [
+                'desc(path_string_id)'
+            ],
+            'label' => [
+                'eng-GB' => 'Path Desc.'
+            ]
+        ],
+        'sort_by_invisible_b_asc' => [
+            'condition' => [
+                'asc(invisible_b)'
+            ],
+            'label' => [
+                'eng-GB' => 'Invisible Asc.'
+            ]
+        ],
+        'sort_by_invisible_b_desc' => [
+            'condition' => [
+                'desc(invisible_b)'
+            ],
+            'label' => [
+                'eng-GB' => 'Invisible Desc.'
+            ]
+        ],
     ];
 }

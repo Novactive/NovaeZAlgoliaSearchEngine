@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query;
 
+use Novactive\Bundle\eZAlgoliaSearchEngine\Core\AttributeGenerator;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\FullTextVisitor;
 use RuntimeException;
 use eZ\Publish\API\Repository\Values\Content\Query;
 use eZ\Publish\API\Repository\Values\Content\Search\SearchResult;
@@ -27,6 +29,11 @@ final class Search
      * @var AlgoliaClient
      */
     private $client;
+
+    /**
+     * @var AttributeGenerator;
+     */
+    private $attributeGenerator;
 
     /**
      * @var ResultExtractor
@@ -50,12 +57,14 @@ final class Search
 
     public function __construct(
         AlgoliaClient $client,
+        AttributeGenerator $attributeGenerator,
         ResultExtractor $resultExtractor,
         FacetBuilderVisitor $dispatcherFacetVisitor,
         CriterionVisitor $dispatcherCriterionVisitor,
         SortClauseVisitor $dispatcherSortClauseVisitor
     ) {
         $this->client = $client;
+        $this->attributeGenerator = $attributeGenerator;
         $this->resultExtractor = $resultExtractor;
         $this->dispatcherFacetVisitor = $dispatcherFacetVisitor;
         $this->dispatcherCriterionVisitor = $dispatcherCriterionVisitor;
@@ -73,18 +82,43 @@ final class Search
             $filters .= ' AND '.$this->visitFilter($query->query);
         }
 
+        $queryString = '';
+        $restrictedSearchableAttributes = [];
+
+        // Removing the Fulltext criterion from the filters and transforming it to the query string
+        if (preg_match('#'.sprintf(FullTextVisitor::placeholder, '(.+)').'#', $filters, $match)) {
+            $queryString = $match[1];
+            $filters = preg_replace('# AND '.sprintf(FullTextVisitor::placeholder, '.+').'#', '', $filters);
+            $restrictedSearchableAttributes = $this->attributeGenerator->getCustomSearchableAttributes(true);
+        }
+
+        $languageFilter['useAlwaysAvailable'] = false;
+        if (!$languageFilter['useAlwaysAvailable']) {
+            $filters .= ' AND ('.implode(
+                    ' OR ',
+                    array_map(
+                        static function ($value) {
+                            return 'content_language_codes_ms:"'.$value.'"';
+                        },
+                        $languageFilter['languages']
+                    )
+                ).')';
+        }
+        dump($filters);
+
         $requestOptions = [
             'filters' => $filters,
             'attributesToHighlight' => [],
             'offset' => $query->offset,
             'length' => $query->limit,
             'facets' => $this->visitFacetBuilder($query->facetBuilders),
+            'restrictSearchableAttributes' => $restrictedSearchableAttributes
         ];
 
         return $this->getExtractedSearchResult(
             $languageFilter['languages'][0],
             $this->visitSortClauses($query->sortClauses),
-            '',
+            $queryString,
             $requestOptions,
             $query->facetBuilders
         );

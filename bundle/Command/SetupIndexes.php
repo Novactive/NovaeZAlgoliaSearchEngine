@@ -11,18 +11,14 @@ declare(strict_types=1);
 
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Command;
 
-use eZ\Publish\SPI\Search\FieldType\BooleanField;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\AlgoliaClient;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Core\AttributeGenerator;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\Parameters;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use eZ\Publish\API\Repository\LanguageService;
-use eZ\Publish\API\Repository\ContentTypeService;
-use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
-use eZ\Publish\Core\Search\Common\FieldNameGenerator;
-use eZ\Publish\Core\Search\Common\FieldRegistry;
 
 final class SetupIndexes extends Command
 {
@@ -34,24 +30,14 @@ final class SetupIndexes extends Command
     private $client;
 
     /**
+     * @var AttributeGenerator
+     */
+    private $attributeGenerator;
+
+    /**
      * @var LanguageService
      */
     private $languageService;
-
-    /**
-     * @var ContentTypeService
-     */
-    private $contentTypeService;
-
-    /**
-     * @var FieldNameGenerator
-     */
-    private $fieldNameGenerator;
-
-    /**
-     * @var FieldRegistry
-     */
-    private $fieldRegistry;
 
     protected function configure(): void
     {
@@ -65,16 +51,12 @@ final class SetupIndexes extends Command
      */
     public function setDependencies(
         AlgoliaClient $client,
-        LanguageService $languageService,
-        ContentTypeService $contentTypeService,
-        FieldNameGenerator $fieldNameGenerator,
-        FieldRegistry $fieldRegistry
+        AttributeGenerator $attributeGenerator,
+        LanguageService $languageService
     ): void {
         $this->client = $client;
+        $this->attributeGenerator = $attributeGenerator;
         $this->languageService = $languageService;
-        $this->contentTypeService = $contentTypeService;
-        $this->fieldNameGenerator = $fieldNameGenerator;
-        $this->fieldRegistry = $fieldRegistry;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -92,21 +74,22 @@ final class SetupIndexes extends Command
                 array_keys(Parameters::REPLICAS)
             );
 
-            $attributes = $this->getSearchableAttributes();
+            $customSearchableattributes = $this->attributeGenerator->getCustomSearchableAttributes();
             $attributesForFaceting = array_merge(
                 array_map(
                     static function ($item) {
                         return "filterOnly({$item})";
                     },
-                    $attributes
+                    $customSearchableattributes
                 ),
                 Parameters::ATTRIBUTES_FOR_FACETING
             );
 
             $index->setSettings(
                 [
-                    'searchableAttributes' => array_merge($attributes, Parameters::SEARCH_ATTRIBUTES),
+                    'searchableAttributes' => array_merge($customSearchableattributes, Parameters::SEARCH_ATTRIBUTES),
                     'attributesForFaceting' => $attributesForFaceting,
+                    'attributesToRetrieve' => ['content_id_i', 'location_id_i', 'meta_indexed_language_code_s'],
                     'replicas' => $replicaNames,
                 ],
                 ['forwardToReplicas' => true]
@@ -137,36 +120,5 @@ final class SetupIndexes extends Command
         $io->success('Done.');
 
         return 0;
-    }
-
-    private function getSearchableAttributes(): array
-    {
-        $data = [];
-        foreach ($this->contentTypeService->loadContentTypeGroups() as $contentTypeGroup) {
-            foreach ($this->contentTypeService->loadContentTypes($contentTypeGroup) as $contentType) {
-                /* @var FieldDefinition $fieldDefinition */
-                foreach ($contentType->getFieldDefinitions() as $fieldDefinition) {
-                    if ($fieldDefinition->isSearchable) {
-                        $indexFields = $this->fieldRegistry->getType($fieldDefinition->fieldTypeIdentifier)
-                                                           ->getIndexDefinition();
-                        foreach ($indexFields as $key => $indexField) {
-                            $fullName = $this->fieldNameGenerator->getName(
-                                $key,
-                                $fieldDefinition->identifier,
-                                $contentType->identifier
-                            );
-                            $indexName = $this->fieldNameGenerator->getTypedName($fullName, $indexField);
-                            $data[] = $indexName;
-                        }
-                        $data[] = $this->fieldNameGenerator->getTypedName(
-                            $this->fieldNameGenerator->getName('is_empty', $fieldDefinition->identifier),
-                            new BooleanField()
-                        );
-                    }
-                }
-            }
-        }
-
-        return array_unique($data);
     }
 }

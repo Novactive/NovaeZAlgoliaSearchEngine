@@ -57,3 +57,7 @@ _novaezalgoliasearchengine_routes:
 ### ENV variables
 
 The `SEARCH_ENGINE` environment variable  should be set to `algolia`
+
+### Usage
+
+Not all the Criterions are implemented due to some specific constraints of Algolia.

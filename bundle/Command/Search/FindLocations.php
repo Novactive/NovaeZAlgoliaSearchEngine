@@ -13,6 +13,7 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Command\Search;
 
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\LocationQuery;
+use eZ\Publish\API\Repository\Values\Content\Query\SortClause;
 use eZ\Publish\Core\Repository\Values\Content\Location;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -55,6 +56,7 @@ final class FindLocations extends Command
         $query->query = new Criterion\MatchAll();
         $query->offset = 0;
         $query->limit = 10;
+        $query->sortClauses = [new SortClause\Location\Priority()];
 
         $result = $this->repository->getSearchService()->findLocations($query);
 
