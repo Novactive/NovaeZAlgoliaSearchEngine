@@ -67,6 +67,19 @@ final class Parameters
         'filterOnly(location_ancestors_path_string_mid)',
     ];
 
+    public const ATTRIBUTES_TO_RETRIEVE = [
+        'content_id_i',
+        'location_id_i',
+        'meta_indexed_language_code_s',
+        'content_name_s'
+    ];
+
+    public const ATTRIBUTES_MAPPING = [
+        'content_type_identifier_s' => [
+            'eng-GB' => 'Content Type'
+        ]
+    ];
+
     public const REPLICAS = [
         'sort_by_content_id_i_asc' => [
             'condition' => [

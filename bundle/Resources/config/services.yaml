@@ -19,8 +19,16 @@ services:
         bind:
             $persistenceHandler: '@ezpublish.api.storage_engine'
 
+    Novactive\Bundle\eZAlgoliaSearchEngine\Controller\:
+        resource: '../../Controller'
+        tags: ['controller.service_arguments']
+
     Novactive\Bundle\eZAlgoliaSearchEngine\Core\:
         resource: '../../Core'
+        exclude: '../../Core/Search'
+
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\Search\Search: ~
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\Search\SearchQueryFactory: ~
 
     Novactive\Bundle\eZAlgoliaSearchEngine\Core\Indexer:
         arguments:

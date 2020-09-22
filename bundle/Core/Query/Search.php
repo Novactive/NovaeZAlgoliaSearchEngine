@@ -13,6 +13,7 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query;
 
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\AttributeGenerator;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\FullTextVisitor;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\Parameters;
 use RuntimeException;
 use eZ\Publish\API\Repository\Values\Content\Query;
 use eZ\Publish\API\Repository\Values\Content\Search\SearchResult;
@@ -92,7 +93,6 @@ final class Search
             $restrictedSearchableAttributes = $this->attributeGenerator->getCustomSearchableAttributes(true);
         }
 
-        $languageFilter['useAlwaysAvailable'] = false;
         if (!$languageFilter['useAlwaysAvailable']) {
             $filters .= ' AND ('.implode(
                     ' OR ',
@@ -104,7 +104,6 @@ final class Search
                     )
                 ).')';
         }
-        dump($filters);
 
         $requestOptions = [
             'filters' => $filters,
@@ -112,7 +111,8 @@ final class Search
             'offset' => $query->offset,
             'length' => $query->limit,
             'facets' => $this->visitFacetBuilder($query->facetBuilders),
-            'restrictSearchableAttributes' => $restrictedSearchableAttributes
+            'restrictSearchableAttributes' => $restrictedSearchableAttributes,
+            'attributesToRetrieve' => Parameters::ATTRIBUTES_TO_RETRIEVE
         ];
 
         return $this->getExtractedSearchResult(

@@ -58,6 +58,19 @@ _novaezalgoliasearchengine_routes:
 
 The `SEARCH_ENGINE` environment variable  should be set to `algolia`
 
-### Usage
+## Usage
 
-Not all the Criterions are implemented due to some specific constraints of Algolia.
+#### Configuration parameters
+The default list of the attributes that are sent to Algolia within the `indexes:setup` command are stored in the **Mapping\Parameters.php** class.
+They are:
+- Searchable Attributes;
+- Attributes for Faceting;
+- Attributes to Retrieve;
+- Replicas (used for sorting);
+- Attributes Mapping (used to display the labels of some particular attributes e.g. when they are used as facets).
+
+
+
+#### Query Criterions
+Not all the Criterions are implemented due to some specific constraints of Algolia. 
+In particular the MapDistance Criterion is not implemented.

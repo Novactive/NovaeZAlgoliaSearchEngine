@@ -89,7 +89,7 @@ final class SetupIndexes extends Command
                 [
                     'searchableAttributes' => array_merge($customSearchableattributes, Parameters::SEARCH_ATTRIBUTES),
                     'attributesForFaceting' => $attributesForFaceting,
-                    'attributesToRetrieve' => ['content_id_i', 'location_id_i', 'meta_indexed_language_code_s'],
+                    'attributesToRetrieve' => ['*'],
                     'replicas' => $replicaNames,
                 ],
                 ['forwardToReplicas' => true]

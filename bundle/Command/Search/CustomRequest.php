@@ -14,26 +14,42 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Command\Search;
 use eZ\Publish\Core\Repository\Values\Content\Content;
 use eZ\Publish\Core\Repository\Values\Content\Location;
 use eZ\Publish\SPI\Persistence\Content\ContentInfo;
-use Novactive\Bundle\eZAlgoliaSearchEngine\Core\ClientService;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Search\Search;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Search\SearchQueryFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use eZ\Publish\API\Repository\Values\Content\Query;
 
 final class CustomRequest extends Command
 {
     protected static $defaultName = 'nova:ez:algolia:custom:request';
 
     /**
-     * @var ClientService
-     */
-    private $clientService;
-
-    /**
      * @var SymfonyStyle
      */
     private $io;
+
+    /**
+     * @var Search
+     */
+    private $searchService;
+
+    /**
+     * @var SearchQueryFactory
+     */
+    private $searchQueryFactory;
+
+    /**
+     * @required
+     */
+    public function setDependencies(Search $searchService, SearchQueryFactory $searchQueryFactory): void
+    {
+        $this->searchService = $searchService;
+        $this->searchQueryFactory = $searchQueryFactory;
+    }
 
     protected function configure(): void
     {
@@ -41,14 +57,6 @@ final class CustomRequest extends Command
             ->setName(self::$defaultName)
             ->setDescription('Send a custom request to Algolia using the Client Search method parameters.')
             ->addArgument('type', InputArgument::REQUIRED, 'Request type (content, location, raw)');
-    }
-
-    /**
-     * @required
-     */
-    public function setDependencies(ClientService $clientService): void
-    {
-        $this->clientService = $clientService;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -76,16 +84,22 @@ final class CustomRequest extends Command
 
     private function contentSearch(): void
     {
-        $requestOptions = [
-            'filters' => 'content_type_identifier_s:article',
-            'attributesToHighlight' => [],
-            'offset' => 0,
-            'length' => 10,
-            'aroundLatLng' => '37.7512306, -122.4584587',
-            'aroundRadius' => 3000
-        ];
+        $query = $this->searchQueryFactory->create(
+            '',
+            'location_ancestors_path_string_mid:"/1/2/42/57/"',
+            ['content_type_identifier_s']
+        );
+        $query->setRequestOption('aroundLatLng', '37.7512306, -122.4584587');
+        $query->setRequestOption('aroundRadius', 3000);
 
-        $result = $this->clientService->contentSearch('eng-GB', null, '', $requestOptions);
+        $result = $this->searchService->findContents(
+            $query,
+            [
+                new Query\FacetBuilder\ContentTypeFacetBuilder(
+                    ['name' => 'ContentType']
+                )
+            ]
+        );
 
         if (0 === $result->totalCount) {
             $this->io->text('No Results found.');
@@ -120,14 +134,13 @@ final class CustomRequest extends Command
 
     private function locationSearch(): void
     {
-        $requestOptions = [
-            'filters' => 'content_type_identifier_s:article',
-            'attributesToHighlight' => [],
-            'offset' => 0,
-            'length' => 5,
-        ];
+        $query = $this->searchQueryFactory->create(
+            '',
+            'content_language_codes_ms:"eng-GB"',
+        );
+        $query->setReplica('sort_by_location_id_i_asc');
 
-        $result = $this->clientService->locationSearch('eng-GB', null, '', $requestOptions);
+        $result = $this->searchService->findLocations($query);
 
         $this->io->section('Results:');
         foreach ($result->searchHits as $searchHit) {
@@ -140,20 +153,25 @@ final class CustomRequest extends Command
 
     private function rawSearch(): void
     {
-        $requestOptions = [
-            'filters' => 'doc_type_s:content AND short_title_is_empty_b:false',
-            'attributesToHighlight' => [],
-            'offset' => 0,
-            'length' => 10,
-            'attributesToRetrieve' => ['*']
-        ];
-
-        $result = $this->clientService->rawSearch('eng-GB', null, '', $requestOptions);
-
+        $facets = ['doc_type_s'];
+        $query = $this->searchQueryFactory->create(
+            'en',
+            'content_type_identifier_s:"article"',
+            $facets
+        );
+        $query->setRequestOption('attributesToRetrieve', ['content_name_s']);
+        $searchResult = $this->searchService->find($query);
         $this->io->section('Results:');
-        foreach ($result['hits'] as $hit) {
-            $this->io->writeln($hit['objectID']);
+        foreach ($searchResult->getIterator() as $hit) {
+            $this->io->writeln($hit['objectID'].' -> '.$hit['content_name_s']);
         }
+        $this->io->section('Facets:');
+        foreach ($facets as $facet) {
+            foreach ($searchResult->getFacets($facet) as $name => $value) {
+                $this->io->writeln("{$name} => {$value}");
+            }
+        }
+
         $this->io->newLine();
     }
 }

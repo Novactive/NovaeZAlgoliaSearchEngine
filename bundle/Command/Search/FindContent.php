@@ -13,7 +13,6 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Command\Search;
 
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Query;
-use eZ\Publish\API\Repository\Values\Content\Query\FacetBuilder\ContentTypeFacetBuilder;
 use eZ\Publish\Core\Repository\Values\Content\Content;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -53,8 +52,8 @@ final class FindContent extends Command
 
         $query->filter = new Criterion\ContentTypeIdentifier('article');
 
-        $query->facetBuilders[] = new ContentTypeFacetBuilder(['name' => 'ContentType']);
-        //$query->sortClauses = [new Query\SortClause\ContentId()];
+        $query->facetBuilders[] = new Query\FacetBuilder\ContentTypeFacetBuilder(['name' => 'ContentType']);
+        $query->sortClauses = [new Query\SortClause\ContentId()];
 
         $result = $this->repository->getSearchService()->findContent($query);
 
@@ -66,7 +65,7 @@ final class FindContent extends Command
             foreach ($result->searchHits as $searchHit) {
                 /* @var Content $content */
                 $content = $searchHit->valueObject;
-                $output->writeln($content->getFieldValue('title'));
+                $output->writeln($content->getName());
             }
             $io->newLine();
 
