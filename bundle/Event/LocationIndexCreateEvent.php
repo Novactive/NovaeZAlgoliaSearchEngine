@@ -12,34 +12,23 @@ declare(strict_types=1);
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Event;
 
 use eZ\Publish\SPI\Persistence\Content\Location;
-use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\LocationDocument;
-use Symfony\Contracts\EventDispatcher\Event;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\Document;
 
-final class LocationIndexCreateEvent extends Event
+final class LocationIndexCreateEvent extends DocumentCreateEvent
 {
     /**
      * @var Location
      */
     private $location;
 
-    /**
-     * @var LocationDocument
-     */
-    private $document;
-
-    public function __construct(Location $location, LocationDocument $document)
+    public function __construct(Location $location, Document $document)
     {
+        parent::__construct($document);
         $this->location = $location;
-        $this->document = $document;
     }
 
     public function getLocation(): Location
     {
         return $this->location;
-    }
-
-    public function getDocument(): LocationDocument
-    {
-        return $this->document;
     }
 }

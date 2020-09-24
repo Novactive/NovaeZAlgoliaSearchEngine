@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Search;
 
 use eZ\Publish\Core\MVC\ConfigResolverInterface;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Event\QueryCreateEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SearchQueryFactory
 {
@@ -20,9 +22,15 @@ class SearchQueryFactory
      */
     private $configResolver;
 
-    public function __construct(ConfigResolverInterface $configResolver)
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    public function __construct(ConfigResolverInterface $configResolver, EventDispatcherInterface $eventDispatcher)
     {
         $this->configResolver = $configResolver;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function create(
@@ -33,7 +41,10 @@ class SearchQueryFactory
         int $hitsPerPage = 25
     ): Query {
         $language = $this->configResolver->getParameter('languages')[0];
+        $query = new Query($language, $term, $filter, $facets, $page, $hitsPerPage);
 
-        return new Query($language, $term, $filter, $facets, $page, $hitsPerPage);
+        $this->eventDispatcher->dispatch(new QueryCreateEvent($query));
+
+        return $query;
     }
 }

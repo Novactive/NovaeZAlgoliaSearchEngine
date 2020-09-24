@@ -49,7 +49,7 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
                 <table cellSpacing={'10px'}>
                     <tbody>
                         <tr>
-                            <td></td>
+                            <td>&nbsp;</td>
                             <td>
                                 <Stats />
                             </td>
@@ -82,7 +82,7 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
                             </td>
                         </tr>
                         <tr>
-                            <td></td>
+                            <td>&nbsp;</td>
                             <td colSpan={4}>
                                 <CustomPagination />
                             </td>
@@ -95,7 +95,9 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
 };
 
 const CustomHitsPerPage = ({ hitsPerPage }) => {
-    const items = [{ value: hitsPerPage, label: hitsPerPage + ' hits per page' }];
+    const items = [
+        { value: hitsPerPage, label: hitsPerPage + ' hits per page' }
+    ];
     const biggerValue = hitsPerPage * 2;
     items.unshift({
         value: biggerValue,

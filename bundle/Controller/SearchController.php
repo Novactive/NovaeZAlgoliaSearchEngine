@@ -22,15 +22,16 @@ class SearchController
      */
     public function searchAction(SearchQueryFactory $searchQueryFactory, SerializerInterface $serializer): array
     {
-        $query = $searchQueryFactory->create(
-            '',
-            'section_id_i=1',
-            ['content_type_identifier_s'],
-            0,
-            5
-        );
-        $query->setReplica('sort_by_content_name_s_asc');
-        $query->setRequestOption('attributesToRetrieve', ['content_name_s']);
+//        $query = $searchQueryFactory->create(
+//            '',
+//            'section_id_i=1',
+//            ['content_type_identifier_s'],
+//            0,
+//            5
+//        );
+        //$query->setReplica('sort_by_content_name_s_asc');
+        //$query->setRequestOption('attributesToRetrieve', ['content_name_s']);
+        $query = $searchQueryFactory->create();
 
         return ['query' => $serializer->serialize($query, 'json')];
     }

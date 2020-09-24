@@ -80,20 +80,14 @@ class Query
         $this->requestOptions = [];
     }
 
-    public function addFilter(string $filter): self
-    {
-        $filter = trim($filter);
-        if ('' === $filter) {
-            return $this;
-        }
-        $this->filters[] = "({$filter})";
-
-        return $this;
-    }
-
     public function getLanguage(): string
     {
         return $this->language;
+    }
+
+    public function setLanguage(string $language): void
+    {
+        $this->language = $language;
     }
 
     public function getReplica(): ?string
@@ -111,6 +105,11 @@ class Query
         return $this->term;
     }
 
+    public function setTerm(string $term): void
+    {
+        $this->term = $term;
+    }
+
     public function getFilters(): array
     {
         return $this->filters;
@@ -124,14 +123,35 @@ class Query
         return implode(' AND ', $this->filters);
     }
 
+    public function addFilter(string $filter): self
+    {
+        $filter = trim($filter);
+        if ('' === $filter) {
+            return $this;
+        }
+        $this->filters[] = "({$filter})";
+
+        return $this;
+    }
+
     public function getPage(): int
     {
         return $this->page;
     }
 
+    public function setPage(int $page): void
+    {
+        $this->page = $page;
+    }
+
     public function getHitsPerPage(): int
     {
         return $this->hitsPerPage;
+    }
+
+    public function setHitsPerPage(int $hitsPerPage): void
+    {
+        $this->hitsPerPage = $hitsPerPage;
     }
 
     /**
@@ -146,9 +166,18 @@ class Query
         return self::DEFAULT_FACETS;
     }
 
+    public function setFacets(array $facets): void
+    {
+        $this->facets = $facets;
+    }
+
+    public function addFacet(string $facet): void
+    {
+        $this->facets[] = $facet;
+    }
+
     public function setRequestOption(string $key, $value): void
     {
-
         $this->requestOptions[$key] = $value;
     }
 

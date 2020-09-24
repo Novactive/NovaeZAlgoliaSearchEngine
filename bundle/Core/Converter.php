@@ -33,10 +33,9 @@ use eZ\Publish\SPI\Search\FieldType\StringField;
 use Iterator;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Event\ContentIndexCreateEvent;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Event\LocationIndexCreateEvent;
-use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\ContentDocument;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\Document as BaseDocument;
 use eZ\Publish\SPI\Search\FieldType\IdentifierField;
 use eZ\Publish\Core\Persistence\FieldType;
-use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\LocationDocument;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class Converter
@@ -78,8 +77,7 @@ final class Converter
         FieldTypeRegistry $fieldTypeRegistry,
         EventDispatcherInterface $eventDispatcher,
         DocumentIdGenerator $documentIdGenerator
-    )
-    {
+    ) {
         $this->persistenceHandler = $persistenceHandler;
         $this->fieldRegistry = $fieldRegistry;
         $this->fieldNameGenerator = $fieldNameGenerator;
@@ -93,7 +91,7 @@ final class Converter
         $versionInfo = $content->versionInfo;
         $contentInfo = $content->versionInfo->contentInfo;
 
-        $baseDocument = new ContentDocument();
+        $baseDocument = new BaseDocument();
         $baseDocument->fields[] = new Field(
             'content_id',
             $contentInfo->id,
@@ -138,7 +136,7 @@ final class Converter
         $versionInfo = $content->versionInfo;
         $contentInfo = $content->versionInfo->contentInfo;
 
-        $baseDocument = new LocationDocument();
+        $baseDocument = new BaseDocument();
         $baseDocument->contentTypeId = $contentInfo->contentTypeId;
 
         $baseDocument->fields[] = new Field(
@@ -181,10 +179,14 @@ final class Converter
         // Used in Subtree Visitor
         $baseDocument->fields[] = new Field(
             'ancestors_path_string',
-            array_map(static function ($item) use (&$path) {
-                $path = $path ?: '/';
-                return $path .= $item . '/';
-            }, array_filter(explode('/', $location->pathString))),
+            array_map(
+                static function ($item) use (&$path) {
+                    $path = $path ? : '/';
+
+                    return $path .= $item.'/';
+                },
+                array_filter(explode('/', $location->pathString))
+            ),
             new MultipleIdentifierField()
         );
 
@@ -337,7 +339,7 @@ final class Converter
             foreach ($locationData['path_strings'] as $pathString) {
                 $path = '/';
                 foreach (array_filter(explode('/', $pathString)) as $item) {
-                    $path .= $item . '/';
+                    $path .= $item.'/';
                     if (!\in_array($path, $paths, true)) {
                         $paths[] = $path;
                     }
@@ -405,8 +407,7 @@ final class Converter
         Document $document,
         ContentInfo $contentInfo,
         string $languageCode
-    ): void
-    {
+    ): void {
         $isMainTranslation = $languageCode === $contentInfo->mainLanguageCode;
 
         $document->fields[] = new Field(
