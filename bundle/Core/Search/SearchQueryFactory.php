@@ -41,6 +41,7 @@ class SearchQueryFactory
         int $hitsPerPage = 25
     ): Query {
         $language = $this->configResolver->getParameter('languages')[0];
+
         $query = new Query($language, $term, $filter, $facets, $page, $hitsPerPage);
 
         $this->eventDispatcher->dispatch(new QueryCreateEvent($query));

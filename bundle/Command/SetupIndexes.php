@@ -13,12 +13,14 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Command;
 
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\AlgoliaClient;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\AttributeGenerator;
+use Novactive\Bundle\eZAlgoliaSearchEngine\DependencyInjection\Configuration;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\Parameters;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use eZ\Publish\API\Repository\LanguageService;
+use eZ\Publish\Core\MVC\ConfigResolverInterface;
 
 final class SetupIndexes extends Command
 {
@@ -39,6 +41,11 @@ final class SetupIndexes extends Command
      */
     private $languageService;
 
+    /**
+     * @var ConfigResolverInterface
+     */
+    private $configResolver;
+
     protected function configure(): void
     {
         $this
@@ -52,29 +59,32 @@ final class SetupIndexes extends Command
     public function setDependencies(
         AlgoliaClient $client,
         AttributeGenerator $attributeGenerator,
-        LanguageService $languageService
+        LanguageService $languageService,
+        ConfigResolverInterface $configResolver
     ): void {
         $this->client = $client;
         $this->attributeGenerator = $attributeGenerator;
         $this->languageService = $languageService;
+        $this->configResolver = $configResolver;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
+        $customSearchableattributes = $this->attributeGenerator->getCustomSearchableAttributes();
+
         foreach ($this->languageService->loadLanguages() as $language) {
 
             $index = $this->client->getIndex($language->languageCode);
 
-            $replicaNames = array_map(
-                static function (string $suffix) use ($index) {
-                    return "{$index->getIndexName()}-{$suffix}";
-                },
-                array_keys(Parameters::REPLICAS)
+            $replicas = Parameters::getReplicas(
+                $this->configResolver->getParameter(
+                    'attributes_for_replicas',
+                    Configuration::NAMESPACE
+                )
             );
 
-            $customSearchableattributes = $this->attributeGenerator->getCustomSearchableAttributes();
             $attributesForFaceting = array_merge(
                 array_map(
                     static function ($item) {
@@ -82,28 +92,42 @@ final class SetupIndexes extends Command
                     },
                     $customSearchableattributes
                 ),
-                Parameters::ATTRIBUTES_FOR_FACETING
+                $this->configResolver->getParameter(
+                    'attributes_for_faceting',
+                    Configuration::NAMESPACE
+                )
             );
 
             $index->setSettings(
                 [
-                    'searchableAttributes' => array_merge($customSearchableattributes, Parameters::SEARCH_ATTRIBUTES),
+                    'searchableAttributes' => array_merge(
+                        $customSearchableattributes,
+                        $this->configResolver->getParameter(
+                            'searchable_attributes',
+                            Configuration::NAMESPACE
+                        )
+                    ),
                     'attributesForFaceting' => $attributesForFaceting,
                     'attributesToRetrieve' => ['*'],
-                    'replicas' => $replicaNames,
+                    'replicas' => array_map(
+                        static function (string $suffix) use ($index) {
+                            return "{$index->getIndexName()}-{$suffix}";
+                        },
+                        array_column($replicas, 'key')
+                    ),
                 ],
                 ['forwardToReplicas' => true]
             );
 
             $io->section('Index '.$index->getIndexName().' created.');
 
-            foreach (Parameters::REPLICAS as $replicaSuffix => $attributes) {
-                $replica = $this->client->getIndex($language->languageCode, $replicaSuffix);
+            foreach ($replicas as $replicaItem) {
+                $replica = $this->client->getIndex($language->languageCode, 'admin', $replicaItem['key']);
                 $io->writeln('replica '.$replica->getIndexName().' set');
                 $replica->setSettings(
                     [
                         'ranking' => array_merge(
-                            $attributes['condition'],
+                            [$replicaItem['condition']],
                             [
                                 'typo',
                                 'words',

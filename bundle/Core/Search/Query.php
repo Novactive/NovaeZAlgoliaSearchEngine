@@ -95,9 +95,14 @@ class Query
         return $this->replica;
     }
 
-    public function setReplica(?string $replica): void
+    public function setReplica(string $replica): void
     {
         $this->replica = $replica;
+    }
+
+    public function setReplicaByAttribute(string $attribute, string $order = 'asc'): void
+    {
+        $this->replica = "sort_by_{$attribute}_{$order}";
     }
 
     public function getTerm(): string
@@ -113,6 +118,11 @@ class Query
     public function getFilters(): array
     {
         return $this->filters;
+    }
+
+    public function setFilters(array $filters): void
+    {
+        $this->filters = $filters;
     }
 
     /**

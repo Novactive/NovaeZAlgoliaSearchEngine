@@ -4,10 +4,7 @@
 
     <h1>Algolia Search</h1>
 
-    {% set replicas = constant('Novactive\\Bundle\\eZAlgoliaSearchEngine\\Mapping\\Parameters::REPLICAS')|json_encode %}
-    {% set algoliaConfig = constant('Novactive\\Bundle\\eZAlgoliaSearchEngine\\Core\\AlgoliaClient::CONFIG')|json_encode %}
-
-    <div id="js-algolia-search-container" data-replicas="{{ replicas }}" data-config="{{ algoliaConfig }}" data-query="{{ query }}"></div>
+    <div id="js-algolia-search-container" data-replicas="{{ replicas|json_encode }}" data-config="{{ config|json_encode }}" data-query="{{ query }}"></div>
 
     {{ encore_entry_script_tags('nova_ezalgolia', null, 'nova_ezalgolia') }}
 

@@ -13,7 +13,7 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query;
 
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\AttributeGenerator;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\FullTextVisitor;
-use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\Parameters;
+use Novactive\Bundle\eZAlgoliaSearchEngine\DependencyInjection\Configuration;
 use RuntimeException;
 use eZ\Publish\API\Repository\Values\Content\Query;
 use eZ\Publish\API\Repository\Values\Content\Search\SearchResult;
@@ -23,6 +23,7 @@ use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\ResultExtractor\ResultExtr
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\CriterionVisitor;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\SortClauseVisitor\SortClauseVisitor;
+use eZ\Publish\Core\MVC\ConfigResolverInterface;
 
 final class Search
 {
@@ -56,13 +57,19 @@ final class Search
      */
     private $dispatcherSortClauseVisitor;
 
+    /**
+     * @var ConfigResolverInterface
+     */
+    private $configResolver;
+
     public function __construct(
         AlgoliaClient $client,
         AttributeGenerator $attributeGenerator,
         ResultExtractor $resultExtractor,
         FacetBuilderVisitor $dispatcherFacetVisitor,
         CriterionVisitor $dispatcherCriterionVisitor,
-        SortClauseVisitor $dispatcherSortClauseVisitor
+        SortClauseVisitor $dispatcherSortClauseVisitor,
+        ConfigResolverInterface $configResolver
     ) {
         $this->client = $client;
         $this->attributeGenerator = $attributeGenerator;
@@ -70,6 +77,7 @@ final class Search
         $this->dispatcherFacetVisitor = $dispatcherFacetVisitor;
         $this->dispatcherCriterionVisitor = $dispatcherCriterionVisitor;
         $this->dispatcherSortClauseVisitor = $dispatcherSortClauseVisitor;
+        $this->configResolver = $configResolver;
     }
 
     public function execute(Query $query, string $docType, array $languageFilter): SearchResult
@@ -112,7 +120,10 @@ final class Search
             'length' => $query->limit,
             'facets' => $this->visitFacetBuilder($query->facetBuilders),
             'restrictSearchableAttributes' => $restrictedSearchableAttributes,
-            'attributesToRetrieve' => Parameters::ATTRIBUTES_TO_RETRIEVE
+            'attributesToRetrieve' => $this->configResolver->getParameter(
+                'attributes_to_retrieve',
+                Configuration::NAMESPACE
+            )
         ];
 
         return $this->getExtractedSearchResult(
@@ -130,7 +141,7 @@ final class Search
         string $query = '',
         array $requestOptions = []
     ): array {
-        return $this->client->getIndex($languageCode, $replaicaName)->search($query, $requestOptions);
+        return $this->client->getIndex($languageCode, 'search', $replaicaName)->search($query, $requestOptions);
     }
 
     public function getExtractedSearchResult(

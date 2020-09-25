@@ -17,13 +17,12 @@ import {
 const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
     const searchClient = algoliasearch(
         JSON.parse(config).app_id,
-        JSON.parse(config).app_secret
+        JSON.parse(config).api_key
     );
 
     const queryParameters = JSON.parse(query);
 
-    const indexName =
-        JSON.parse(config).index_name + '-' + queryParameters.language;
+    const indexName = JSON.parse(config).index_name_prefix + '-' + queryParameters.language;
 
     const fullIndexName = (indexName, replica) => {
         if (replica !== null) {
@@ -69,7 +68,6 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
                                         indexName,
                                         queryParameters.replica
                                     )}
-                                    language={queryParameters.language}
                                 />
                             </td>
                         </tr>
@@ -110,14 +108,11 @@ const CustomHitsPerPage = ({ hitsPerPage }) => {
     return <HitsPerPage defaultRefinement={hitsPerPage} items={items} />;
 };
 
-const CustomSorting = ({ indexName, replicas, fullIndexName, language }) => {
+const CustomSorting = ({ indexName, replicas, fullIndexName }) => {
     const items = [{ value: indexName, label: 'Default' }];
-    for (const key in replicas) {
-        let label = replicas[key].label[language];
-        if (undefined === label) {
-            label = replicas[key].label['eng-GB'];
-        }
-        items.push({ value: indexName + '-' + key, label: label });
+    for (let key in replicas) {
+        let label = replicas[key].replace('sort_by_', '');
+        items.push({ value: indexName + '-' + replicas[key], label: label });
     }
 
     return (

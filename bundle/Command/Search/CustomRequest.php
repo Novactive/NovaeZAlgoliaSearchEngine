@@ -138,7 +138,7 @@ final class CustomRequest extends Command
             '',
             'content_language_codes_ms:"eng-GB"',
         );
-        $query->setReplica('sort_by_location_id_i_asc');
+        $query->setReplicaByAttribute('location_id_i');
 
         $result = $this->searchService->findLocations($query);
 

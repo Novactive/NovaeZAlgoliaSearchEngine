@@ -27,6 +27,10 @@ services:
         resource: '../../Core'
         exclude: '../../Core/Search'
 
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\AlgoliaClient:
+        bind:
+            $dispatcherCriterionVisitor: '@ezplatform.search.algolia.query.content.criterion_visitor.dispatcher'
+
     Novactive\Bundle\eZAlgoliaSearchEngine\Core\Search\Search: ~
     Novactive\Bundle\eZAlgoliaSearchEngine\Core\Search\SearchQueryFactory: ~
 
