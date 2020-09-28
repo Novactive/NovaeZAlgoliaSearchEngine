@@ -18,6 +18,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Serializer\SerializerInterface;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Search\SearchQueryFactory;
 use eZ\Publish\Core\MVC\ConfigResolverInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SearchController
 {
@@ -28,20 +29,25 @@ class SearchController
         SearchQueryFactory $searchQueryFactory,
         SerializerInterface $serializer,
         ConfigResolverInterface $configResolver,
-        AlgoliaClient $algoliaClient
+        AlgoliaClient $algoliaClient,
+        TranslatorInterface $translator
     ): array {
         $query = $searchQueryFactory->create();
 
         return [
             'query' => $serializer->serialize($query, 'json'),
-            'replicas' => array_column(
+            'replicas' => array_map(
+                static function ($item) use ($translator) {
+                    $item['label'] = $translator->trans($item['key'], [], 'novaezalgolia');
+
+                    return $item;
+                },
                 Parameters::getReplicas(
                     $configResolver->getParameter(
                         'attributes_for_replicas',
                         Configuration::NAMESPACE
                     )
-                ),
-                'key'
+                )
             ),
             'config' => [
                 'index_name_prefix' => $configResolver->getParameter('index_name_prefix', Configuration::NAMESPACE),

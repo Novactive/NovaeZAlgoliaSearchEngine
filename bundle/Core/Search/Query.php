@@ -60,7 +60,7 @@ class Query
      */
     private $requestOptions;
 
-    public const DEFAULT_FACETS = ['content_type_identifier_s'];
+    public const DEFAULT_FACETS = ['content_type_name_s'];
 
     public function __construct(
         string $language,

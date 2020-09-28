@@ -22,7 +22,8 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
 
     const queryParameters = JSON.parse(query);
 
-    const indexName = JSON.parse(config).index_name_prefix + '-' + queryParameters.language;
+    const indexName =
+        JSON.parse(config).index_name_prefix + '-' + queryParameters.language;
 
     const fullIndexName = (indexName, replica) => {
         if (replica !== null) {
@@ -102,7 +103,7 @@ const CustomHitsPerPage = ({ hitsPerPage }) => {
         label: biggerValue + ' hits per page'
     });
     if (hitsPerPage > 1) {
-        const lessValue = Math.round(hitsPerPage / 2);
+        const lessValue = Math.floor(hitsPerPage / 2);
         items.push({ value: lessValue, label: lessValue + ' hits per page' });
     }
     return <HitsPerPage defaultRefinement={hitsPerPage} items={items} />;
@@ -110,9 +111,12 @@ const CustomHitsPerPage = ({ hitsPerPage }) => {
 
 const CustomSorting = ({ indexName, replicas, fullIndexName }) => {
     const items = [{ value: indexName, label: 'Default' }];
-    for (let key in replicas) {
-        let label = replicas[key].replace('sort_by_', '');
-        items.push({ value: indexName + '-' + replicas[key], label: label });
+    console.log(replicas);
+    for (const index in replicas) {
+        items.push({
+            value: indexName + '-' + replicas[index].key,
+            label: replicas[index].label
+        });
     }
 
     return (
