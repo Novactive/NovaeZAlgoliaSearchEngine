@@ -37,6 +37,7 @@ final class FindContent extends Command
         $this
             ->setHidden(true)
             ->setName(self::$defaultName)
+            ->setHidden(true)
             ->setDescription('Fetch the Content by Query.');
     }
 
