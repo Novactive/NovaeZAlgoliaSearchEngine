@@ -132,7 +132,7 @@ class Indexer extends IncrementalIndexer
         }
 
         foreach ($this->languageService->loadLanguages() as $language) {
-            if (!in_array($language->languageCode, $contentLanguages, true)) {
+            if (!\in_array($language->languageCode, $contentLanguages, true)) {
                 $langObjectSet[$language->languageCode][] = $mainTranslation;
             }
         }

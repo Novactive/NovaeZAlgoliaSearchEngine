@@ -24,7 +24,7 @@ final class LogicalNotVisitor implements CriterionVisitor
     public function visit(CriterionVisitor $dispatcher, Criterion $criterion, string $additionalOperators = ''): string
     {
         /** @var Criterion\LogicalNot $criterion */
-        if (count($criterion->criteria) !== 1) {
+        if (\count($criterion->criteria) !== 1) {
             throw new RuntimeException('Invalid aggregation in LogicalNot criterion.');
         }
 

@@ -56,7 +56,7 @@ final class DocumentSerializer
                 ];
             }
         }
-        if (count($geolocFields) > 0) {
+        if (\count($geolocFields) > 0) {
             $body['_geoloc'] = $geolocFields;
         }
 

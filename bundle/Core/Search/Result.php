@@ -77,7 +77,7 @@ class Result implements ArrayAccess, IteratorAggregate
 
     public function getFacets(string $name): array
     {
-        if (!array_key_exists($name, $this->facets)) {
+        if (!\array_key_exists($name, $this->facets)) {
             return [];
         }
 

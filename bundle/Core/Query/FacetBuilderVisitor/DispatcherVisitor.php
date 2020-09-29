@@ -37,7 +37,7 @@ final class DispatcherVisitor implements FacetBuilderVisitor
 
         if ($visitor === null) {
             throw new NotImplementedException(
-                'No visitor available for: ' . get_class($builder)
+                'No visitor available for: ' . \get_class($builder)
             );
         }
 

@@ -41,7 +41,7 @@ trait CommonVisitor
         }
 
         if ($criterion->operator === Criterion\Operator::BETWEEN) {
-            if (2 !== count($criterion->value)) {
+            if (2 !== \count($criterion->value)) {
                 throw new RuntimeException("Unsupported number of values for {$criterion->operator} operator");
             }
 

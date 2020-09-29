@@ -36,7 +36,7 @@ final class DispatcherVisitor implements CriterionVisitor
         $visitor = $this->findVisitor($criterion);
         if ($visitor === null) {
             throw new NotImplementedException(
-                'No visitor available for: ' . get_class($criterion) . ' with operator ' . $criterion->operator
+                'No visitor available for: ' . \get_class($criterion) . ' with operator ' . $criterion->operator
             );
         }
 

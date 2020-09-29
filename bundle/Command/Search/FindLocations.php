@@ -21,6 +21,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 
+/**
+ * Just a command to help debugging when contributing
+ */
 final class FindLocations extends Command
 {
     protected static $defaultName = 'nova:ez:algolia:find:locations';
@@ -33,6 +36,7 @@ final class FindLocations extends Command
     protected function configure(): void
     {
         $this
+            ->setHidden(true)
             ->setName(self::$defaultName)
             ->setDescription('Fetch the Locations by Query.');
     }

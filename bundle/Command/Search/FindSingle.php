@@ -19,6 +19,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 
+/**
+ * Just a command to help debugging when contributing
+ */
 final class FindSingle extends Command
 {
     protected static $defaultName = 'nova:ez:algolia:find:single';
@@ -31,6 +34,7 @@ final class FindSingle extends Command
     protected function configure(): void
     {
         $this
+            ->setHidden(true)
             ->setName(self::$defaultName)
             ->setDescription('Fetching the single Content by Id.')
             ->addArgument('contentId', InputArgument::REQUIRED, 'Content Id');

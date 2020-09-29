@@ -49,7 +49,7 @@ final class LogicalOrVisitor implements CriterionVisitor
             $criterion->criteria
         );
 
-        if (count($subCriteria) === 1) {
+        if (\count($subCriteria) === 1) {
             return reset($subCriteria);
         }
 

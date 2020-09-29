@@ -132,7 +132,7 @@ class Handler extends LegacyHandler
                 }
 
                 foreach ($this->languageService->loadLanguages() as $language) {
-                    if (!in_array($language->languageCode, $contentLanguages, true)) {
+                    if (!\in_array($language->languageCode, $contentLanguages, true)) {
                         $this->reindex($language->languageCode, [$mainTranslation]);
                     }
                 }
@@ -161,7 +161,7 @@ class Handler extends LegacyHandler
                 }
 
                 foreach ($this->languageService->loadLanguages() as $language) {
-                    if (!in_array($language->languageCode, $locationLanguages, true)) {
+                    if (!\in_array($language->languageCode, $locationLanguages, true)) {
                         $this->reindex($language->languageCode, [$mainTranslation]);
                     }
                 }
