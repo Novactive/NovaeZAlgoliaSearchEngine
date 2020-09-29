@@ -32,6 +32,10 @@ final class Extension extends BaseExtension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yaml');
+
+        if ($container->getParameter('kernel.debug') === true) {
+            $loader->load('services_dev.yaml');
+        }
         $loader->load('default_settings.yaml');
 
         $processor = new ConfigurationProcessor($container, $this->getAlias());
