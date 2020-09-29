@@ -101,7 +101,7 @@ final class Search
             $restrictedSearchableAttributes = $this->attributeGenerator->getCustomSearchableAttributes(true);
         }
 
-        if (!$languageFilter['useAlwaysAvailable']) {
+        if (isset($languageFilter['useAlwaysAvailable']) && !$languageFilter['useAlwaysAvailable']) {
             $filters .= ' AND ('.implode(
                     ' OR ',
                     array_map(
@@ -117,7 +117,7 @@ final class Search
             'filters' => $filters,
             'attributesToHighlight' => [],
             'offset' => $query->offset,
-            'length' => $query->limit,
+            'length' => $query->limit === 0 ? 1 : $query->limit,
             'facets' => $this->visitFacetBuilder($query->facetBuilders),
             'restrictSearchableAttributes' => $restrictedSearchableAttributes,
             'attributesToRetrieve' => $this->configResolver->getParameter(
@@ -128,7 +128,7 @@ final class Search
 
         return $this->getExtractedSearchResult(
             $languageFilter['languages'][0],
-            $this->visitSortClauses($query->sortClauses),
+            $this->visitSortClauses((array) $query->sortClauses),
             $queryString,
             $requestOptions,
             $query->facetBuilders

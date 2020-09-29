@@ -13,6 +13,7 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core;
 
 use Algolia\AlgoliaSearch\SearchClient;
 use Algolia\AlgoliaSearch\SearchIndex;
+use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 use eZ\Publish\Core\MVC\ConfigResolverInterface;
 use Novactive\Bundle\eZAlgoliaSearchEngine\DependencyInjection\Configuration;
 use eZ\Publish\Core\Repository\Permission\PermissionCriterionResolver;
@@ -84,7 +85,6 @@ final class AlgoliaClient
             throw new InvalidArgumentException('$mode', 'The Index mode must either "admin" or "search".');
         }
         $apiKey = ('admin' === $mode) ? $this->config['api_secret_key'] : $this->getSecuredApiKey();
-
         $client = SearchClient::create($this->config['app_id'], $apiKey);
         $this->indexes[$indexName] = $client->initIndex($indexName);
 
@@ -93,23 +93,21 @@ final class AlgoliaClient
 
     public function getSecuredApiKey(): string
     {
-        static $key;
-        if (null === $key) {
-            $restrictions = [];
-            $permissionsCriterion = $this->permissionCriterionResolver->getPermissionsCriterion('content', 'read');
-            if ($permissionsCriterion) {
-                $restrictions['filters'] = $this->dispatcherCriterionVisitor->visit(
-                    $this->dispatcherCriterionVisitor,
-                    $permissionsCriterion
-                );
-            }
+        $apiSearchOnlyKey = $this->configResolver->getParameter('api_search_only_key', Configuration::NAMESPACE);
 
-            $key = SearchClient::generateSecuredApiKey(
-                $this->configResolver->getParameter('api_search_only_key', Configuration::NAMESPACE),
-                $restrictions
-            );
+        $permissionsCriterion = $this->permissionCriterionResolver->getPermissionsCriterion('content', 'read');
+        if (!$permissionsCriterion instanceof Criterion) {
+            return $apiSearchOnlyKey;
         }
 
-        return $key;
+        return SearchClient::generateSecuredApiKey(
+            $apiSearchOnlyKey,
+            [
+                'filters' => $this->dispatcherCriterionVisitor->visit(
+                    $this->dispatcherCriterionVisitor,
+                    $permissionsCriterion
+                )
+            ]
+        );
     }
 }

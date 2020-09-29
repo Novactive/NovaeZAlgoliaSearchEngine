@@ -23,7 +23,7 @@ final class MapLocationDistanceVisitor implements CriterionVisitor
 
     public function visit(CriterionVisitor $dispatcher, Criterion $criterion, string $additionalOperators = ''): string
     {
-        $message = 'MapLocationDistance criterion is not implemented yet. ';
+        $message = 'MapLocationDistance criterion is not implemented. ';
         $message .= 'Check out the Algolia reference for the possible ways to implement it: ';
         $message .= 'https://www.algolia.com/doc/guides/managing-results/refine-results/';
         $message .= 'geolocation/how-to/filter-results-around-a-location/';

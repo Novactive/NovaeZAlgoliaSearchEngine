@@ -25,6 +25,9 @@ use eZ\Publish\SPI\Persistence\Content\Location;
 use eZ\Publish\Core\Search\Legacy\Content\Handler as LegacyHandler;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\Search;
 use Psr\Log\LoggerInterface;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\ParametersResolver;
+use eZ\Publish\API\Repository\ContentService;
+use eZ\Publish\API\Repository\ContentTypeService;
 
 class Handler extends LegacyHandler
 {
@@ -69,6 +72,21 @@ class Handler extends LegacyHandler
     private $logger;
 
     /**
+     * @var ParametersResolver
+     */
+    private $parametersResolver;
+
+    /**
+     * @var ContentService
+     */
+    private $contentService;
+
+    /**
+     * @var ContentTypeService
+     */
+    private $contentTypeService;
+
+    /**
      * @required
      */
     public function setServices(
@@ -79,7 +97,10 @@ class Handler extends LegacyHandler
         DocumentIdGenerator $documentIdGenerator,
         Search $contentSearch,
         Search $locationSearch,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ParametersResolver $parametersResolver,
+        ContentService $contentService,
+        ContentTypeService $contentTypeService
     ): void {
         $this->client = $client;
         $this->converter = $converter;
@@ -89,29 +110,35 @@ class Handler extends LegacyHandler
         $this->contentSearchService = $contentSearch;
         $this->locationSearchService = $locationSearch;
         $this->logger = $logger;
+        $this->parametersResolver = $parametersResolver;
+        $this->contentService = $contentService;
+        $this->contentTypeService = $contentTypeService;
     }
 
     public function indexContent(Content $content): void
     {
-        try {
-            $contentLanguages = $mainTranslation = [];
-            foreach ($this->converter->convertContent($content) as $document) {
-                $serialized = $this->documentSerializer->serialize($document);
-                $serialized['objectID'] = $document->id;
-                $this->reindex($serialized['meta_indexed_language_code_s'], [$serialized]);
-                $contentLanguages[] = $serialized['meta_indexed_language_code_s'];
-                if ($document->isMainTranslation) {
-                    $mainTranslation = $serialized;
+        $contentType = $this->contentTypeService->loadContentType($content->versionInfo->contentInfo->contentTypeId);
+        if ($this->parametersResolver->ifContentTypeAllowed($contentType->identifier)) {
+            try {
+                $contentLanguages = $mainTranslation = [];
+                foreach ($this->converter->convertContent($content) as $document) {
+                    $serialized = $this->documentSerializer->serialize($document);
+                    $serialized['objectID'] = $document->id;
+                    $this->reindex($serialized['meta_indexed_language_code_s'], [$serialized]);
+                    $contentLanguages[] = $serialized['meta_indexed_language_code_s'];
+                    if ($document->isMainTranslation) {
+                        $mainTranslation = $serialized;
+                    }
                 }
-            }
 
-            foreach ($this->languageService->loadLanguages() as $language) {
-                if (!in_array($language->languageCode, $contentLanguages, true)) {
-                    $this->reindex($language->languageCode, [$mainTranslation]);
+                foreach ($this->languageService->loadLanguages() as $language) {
+                    if (!in_array($language->languageCode, $contentLanguages, true)) {
+                        $this->reindex($language->languageCode, [$mainTranslation]);
+                    }
                 }
+            } catch (Exception $e) {
+                $this->logger->error($e->getMessage());
             }
-        } catch (Exception $e) {
-            $this->logger->error($e->getMessage());
         }
 
         parent::indexContent($content);
@@ -119,25 +146,28 @@ class Handler extends LegacyHandler
 
     public function indexLocation(Location $location): void
     {
-        try {
-            $locationLanguages = $mainTranslation = [];
-            foreach ($this->converter->convertLocation($location) as $document) {
-                $serialized = $this->documentSerializer->serialize($document);
-                $serialized['objectID'] = $document->id;
-                $this->reindex($serialized['meta_indexed_language_code_s'], [$serialized]);
-                $locationLanguages[] = $serialized['meta_indexed_language_code_s'];
-                if ($document->isMainTranslation) {
-                    $mainTranslation = $serialized;
+        $content = $this->contentService->loadContent($location->contentId);
+        if ($this->parametersResolver->ifContentTypeAllowed($content->getContentType()->identifier)) {
+            try {
+                $locationLanguages = $mainTranslation = [];
+                foreach ($this->converter->convertLocation($location) as $document) {
+                    $serialized = $this->documentSerializer->serialize($document);
+                    $serialized['objectID'] = $document->id;
+                    $this->reindex($serialized['meta_indexed_language_code_s'], [$serialized]);
+                    $locationLanguages[] = $serialized['meta_indexed_language_code_s'];
+                    if ($document->isMainTranslation) {
+                        $mainTranslation = $serialized;
+                    }
                 }
-            }
 
-            foreach ($this->languageService->loadLanguages() as $language) {
-                if (!in_array($language->languageCode, $locationLanguages, true)) {
-                    $this->reindex($language->languageCode, [$mainTranslation]);
+                foreach ($this->languageService->loadLanguages() as $language) {
+                    if (!in_array($language->languageCode, $locationLanguages, true)) {
+                        $this->reindex($language->languageCode, [$mainTranslation]);
+                    }
                 }
+            } catch (Exception $e) {
+                $this->logger->error($e->getMessage());
             }
-        } catch (Exception $e) {
-            $this->logger->error($e->getMessage());
         }
 
         parent::indexLocation($location);

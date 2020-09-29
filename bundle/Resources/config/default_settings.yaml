@@ -44,6 +44,7 @@ parameters:
     nova_ezalgoliasearchengine.default.attributes_for_faceting:
         - content_type_name_s
         - doc_type_s
+        - filterOnly(content_type_identifier_s)
         - filterOnly(location_remote_id_mid)
         - filterOnly(section_identifier_id)
         - filterOnly(content_remote_id_id)

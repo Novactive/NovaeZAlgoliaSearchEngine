@@ -95,11 +95,18 @@ class Query
         return $this->replica;
     }
 
+    /**
+     * @param string $replica (example: sort_by_content_id_i_desc)
+     */
     public function setReplica(string $replica): void
     {
         $this->replica = $replica;
     }
 
+    /**
+     * @param string $attribute (example: content_id_i)
+     * @param string $order (example: desc)
+     */
     public function setReplicaByAttribute(string $attribute, string $order = 'asc'): void
     {
         $this->replica = "sort_by_{$attribute}_{$order}";

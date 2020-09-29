@@ -20,6 +20,7 @@ use eZ\Publish\SPI\Persistence\Handler as PersistenceHandler;
 use eZ\Publish\SPI\Search\Handler as SearchHandler;
 use Psr\Log\LoggerInterface;
 use Iterator;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\ParametersResolver;
 
 class Indexer extends IncrementalIndexer
 {
@@ -43,6 +44,11 @@ class Indexer extends IncrementalIndexer
      */
     private $languageService;
 
+    /**
+     * @var ParametersResolver
+     */
+    private $parametersResolver;
+
     public function __construct(
         LoggerInterface $logger,
         PersistenceHandler $persistenceHandler,
@@ -51,13 +57,15 @@ class Indexer extends IncrementalIndexer
         Handler $handler,
         Converter $converter,
         DocumentSerializer $documentSerializer,
-        LanguageService $languageService
+        LanguageService $languageService,
+        ParametersResolver $parametersResolver
     ) {
         parent::__construct($logger, $persistenceHandler, $connection, $searchHandler);
         $this->handler = $handler;
         $this->converter = $converter;
         $this->documentSerializer = $documentSerializer;
         $this->languageService = $languageService;
+        $this->parametersResolver = $parametersResolver;
     }
 
     public function getName(): string
@@ -79,6 +87,11 @@ class Indexer extends IncrementalIndexer
         foreach ($contentIds as $contentId) {
             try {
                 $contentInfo = $contentHandler->loadContentInfo($contentId);
+                $contentType = $this->persistenceHandler->contentTypeHandler()->load($contentInfo->contentTypeId);
+                if (!$this->parametersResolver->ifContentTypeAllowed($contentType->identifier)) {
+                    continue;
+                }
+
                 if ($contentInfo->status === ContentInfo::STATUS_PUBLISHED) {
                     $content = $contentHandler->load($contentId);
                     $this->convertDocuments($this->converter->convertContent($content), $langObjectSet);
@@ -117,7 +130,6 @@ class Indexer extends IncrementalIndexer
                 $mainTranslation = $serialized;
             }
         }
-
 
         foreach ($this->languageService->loadLanguages() as $language) {
             if (!in_array($language->languageCode, $contentLanguages, true)) {

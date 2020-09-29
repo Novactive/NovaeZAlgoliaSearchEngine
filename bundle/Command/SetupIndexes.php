@@ -14,7 +14,7 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Command;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\AlgoliaClient;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\AttributeGenerator;
 use Novactive\Bundle\eZAlgoliaSearchEngine\DependencyInjection\Configuration;
-use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\Parameters;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\ParametersResolver;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -78,7 +78,7 @@ final class SetupIndexes extends Command
 
             $index = $this->client->getIndex($language->languageCode);
 
-            $replicas = Parameters::getReplicas(
+            $replicas = ParametersResolver::getReplicas(
                 $this->configResolver->getParameter(
                     'attributes_for_replicas',
                     Configuration::NAMESPACE

@@ -13,7 +13,7 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Controller;
 
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\AlgoliaClient;
 use Novactive\Bundle\eZAlgoliaSearchEngine\DependencyInjection\Configuration;
-use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\Parameters;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\ParametersResolver;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Serializer\SerializerInterface;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Search\SearchQueryFactory;
@@ -42,7 +42,7 @@ class SearchController
 
                     return $item;
                 },
-                Parameters::getReplicas(
+                ParametersResolver::getReplicas(
                     $configResolver->getParameter(
                         'attributes_for_replicas',
                         Configuration::NAMESPACE
