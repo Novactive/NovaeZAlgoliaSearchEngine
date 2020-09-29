@@ -20,6 +20,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 
+/**
+ * Just a command to help debugging when contributing
+ */
 final class FindContent extends Command
 {
     protected static $defaultName = 'nova:ez:algolia:find:content';
@@ -32,6 +35,7 @@ final class FindContent extends Command
     protected function configure(): void
     {
         $this
+            ->setHidden(true)
             ->setName(self::$defaultName)
             ->setDescription('Fetch the Content by Query.');
     }

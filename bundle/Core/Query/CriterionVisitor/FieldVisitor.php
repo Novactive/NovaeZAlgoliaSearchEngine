@@ -39,8 +39,8 @@ final class FieldVisitor implements CriterionVisitor, FieldInterface
             );
         }
 
-        $criterion->value = (array)$criterion->value;
-        $queries = array();
+        $criterion->value = (array) $criterion->value;
+        $queries = [];
 
         foreach ($searchFields as $name => $fieldType) {
             foreach ($criterion->value as $value) {
@@ -51,10 +51,10 @@ final class FieldVisitor implements CriterionVisitor, FieldInterface
                     true
                 );
 
-                $queries[] = $additionalOperators.$name . ':"' . $preparedValue . '"';
+                $queries[] = $additionalOperators.$name.':"'.$preparedValue.'"';
             }
         }
 
-        return '(' . implode('NOT ' === $additionalOperators ? ' AND ' : ' OR ', $queries) . ')';
+        return '('.implode('NOT ' === $additionalOperators ? ' AND ' : ' OR ', $queries).')';
     }
 }

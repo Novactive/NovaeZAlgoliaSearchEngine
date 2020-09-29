@@ -173,11 +173,11 @@ final class Search
 
     private function visitSortClauses(array $sortClauses): ?string
     {
-        if (count($sortClauses) > 1) {
+        if (\count($sortClauses) > 1) {
             throw new RuntimeException('Only one Sort Clause cab be used to select the sorting replica.');
         }
 
-        if (count($sortClauses) === 0) {
+        if (\count($sortClauses) === 0) {
             return null;
         }
 

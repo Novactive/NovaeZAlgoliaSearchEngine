@@ -35,7 +35,7 @@ final class DispatcherVisitor implements SortClauseVisitor
     {
         $visitor = $this->findVisitor($sortClause);
         if ($visitor === null) {
-            throw new NotImplementedException('No visitor available for: '.get_class($sortClause));
+            throw new NotImplementedException('No visitor available for: '.\get_class($sortClause));
         }
 
         return $visitor->visit($dispatcher, $sortClause);

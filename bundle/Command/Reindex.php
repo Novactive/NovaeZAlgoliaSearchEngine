@@ -19,6 +19,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Handler;
 use eZ\Publish\SPI\Persistence\Handler as PersistenceHandler;
 
+/**
+ * Just a command to help debugging when contributing
+ */
 final class Reindex extends Command
 {
     protected static $defaultName = 'nova:ez:algolia:reindex';
@@ -36,6 +39,7 @@ final class Reindex extends Command
     protected function configure(): void
     {
         $this
+            ->setHidden(true)
             ->setName(self::$defaultName)
             ->setDescription('Reindex the specific Location by provided Id and Content assigned to it.')
             ->addArgument('locationId', InputArgument::REQUIRED, 'Location Id');

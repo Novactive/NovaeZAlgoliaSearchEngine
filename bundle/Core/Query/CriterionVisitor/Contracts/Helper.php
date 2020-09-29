@@ -15,7 +15,7 @@ trait Helper
 {
     private function toString($value): string
     {
-        switch (gettype($value)) {
+        switch (\gettype($value)) {
             case 'boolean':
                 return $value ? 'true' : 'false';
             case 'double':

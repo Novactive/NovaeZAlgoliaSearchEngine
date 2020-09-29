@@ -105,7 +105,6 @@ class Query
 
     /**
      * @param string $attribute (example: content_id_i)
-     * @param string $order (example: desc)
      */
     public function setReplicaByAttribute(string $attribute, string $order = 'asc'): void
     {
@@ -176,7 +175,7 @@ class Query
      */
     public function getFacets(): array
     {
-        if (count($this->facets) > 0) {
+        if (\count($this->facets) > 0) {
             return $this->facets;
         }
 
