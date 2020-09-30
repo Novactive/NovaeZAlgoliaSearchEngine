@@ -31,12 +31,14 @@ use eZ\Publish\SPI\Search\FieldType\MultipleIntegerField;
 use eZ\Publish\SPI\Search\FieldType\MultipleStringField;
 use eZ\Publish\SPI\Search\FieldType\StringField;
 use Iterator;
+use Novactive\Bundle\eZAlgoliaSearchEngine\DependencyInjection\Configuration;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Event\ContentIndexCreateEvent;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Event\LocationIndexCreateEvent;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\Document as BaseDocument;
 use eZ\Publish\SPI\Search\FieldType\IdentifierField;
 use eZ\Publish\Core\Persistence\FieldType;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use eZ\Publish\Core\MVC\ConfigResolverInterface;
 
 final class Converter
 {
@@ -70,13 +72,19 @@ final class Converter
      */
     private $documentIdGenerator;
 
+    /**
+     * @var ConfigResolverInterface
+     */
+    private $configResolver;
+
     public function __construct(
         PersistenceHandler $persistenceHandler,
         FieldRegistry $fieldRegistry,
         FieldNameGenerator $fieldNameGenerator,
         FieldTypeRegistry $fieldTypeRegistry,
         EventDispatcherInterface $eventDispatcher,
-        DocumentIdGenerator $documentIdGenerator
+        DocumentIdGenerator $documentIdGenerator,
+        ConfigResolverInterface $configResolver
     ) {
         $this->persistenceHandler = $persistenceHandler;
         $this->fieldRegistry = $fieldRegistry;
@@ -84,6 +92,7 @@ final class Converter
         $this->fieldTypeRegistry = $fieldTypeRegistry;
         $this->eventDispatcher = $eventDispatcher;
         $this->documentIdGenerator = $documentIdGenerator;
+        $this->configResolver = $configResolver;
     }
 
     public function convertContent(Content $content): Iterator
@@ -466,22 +475,28 @@ final class Converter
                     $document->fields[] = new Field(
                         $this->fieldNameGenerator->getName(
                             $indexField->name,
-                            $fieldDefinition->identifier
-                        ),
-                        $indexField->value,
-                        $indexField->type
-                    );
-
-                    //@todo: duplicate ONLY if the field_identifier_type is in the attributes_for_faceting list
-                    $document->fields[] = new Field(
-                        $this->fieldNameGenerator->getName(
-                            $indexField->name,
                             $fieldDefinition->identifier,
                             $contentType->identifier
                         ),
                         $indexField->value,
                         $indexField->type
                     );
+
+                    // duplicating ONLY if the typed field identifier is in the attributes_for_faceting list
+                    $facetFieldName = $this->fieldNameGenerator->getName(
+                        $indexField->name,
+                        $fieldDefinition->identifier
+                    );
+                    if (\in_array(
+                        $this->fieldNameGenerator->getTypedName(
+                            $facetFieldName,
+                            $indexField->type
+                        ),
+                        $this->configResolver->getParameter('attributes_for_faceting', Configuration::NAMESPACE),
+                        true
+                    )) {
+                        $document->fields[] = new Field($facetFieldName, $indexField->value, $indexField->type);
+                    }
                 }
             }
         }
