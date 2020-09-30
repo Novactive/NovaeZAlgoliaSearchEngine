@@ -466,6 +466,16 @@ final class Converter
                     $document->fields[] = new Field(
                         $this->fieldNameGenerator->getName(
                             $indexField->name,
+                            $fieldDefinition->identifier
+                        ),
+                        $indexField->value,
+                        $indexField->type
+                    );
+
+                    //@todo: duplicate ONLY if the field_identifier_type is in the attributes_for_faceting list
+                    $document->fields[] = new Field(
+                        $this->fieldNameGenerator->getName(
+                            $indexField->name,
                             $fieldDefinition->identifier,
                             $contentType->identifier
                         ),

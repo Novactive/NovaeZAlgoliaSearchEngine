@@ -111,7 +111,6 @@ const CustomHitsPerPage = ({ hitsPerPage }) => {
 
 const CustomSorting = ({ indexName, replicas, fullIndexName }) => {
     const items = [{ value: indexName, label: 'Default' }];
-    console.log(replicas);
     for (const index in replicas) {
         items.push({
             value: indexName + '-' + replicas[index].key,

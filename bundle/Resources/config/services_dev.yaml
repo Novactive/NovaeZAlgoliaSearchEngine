@@ -4,10 +4,6 @@ services:
         autoconfigure: true
         public: true
 
-    Novactive\Bundle\eZExtraBundle\Command\CreateContentTypesCommand:
-        bind:
-            $translationHelper: '@ezpublish.translation_helper'
-
     Novactive\Bundle\eZExtraBundle\Core\Helper\eZ\WrapperFactory: ~
     Novactive\Bundle\eZExtraBundle\Core\Manager\eZ\Content: ~
     Novactive\Bundle\eZExtraBundle\Core\Manager\eZ\ContentType: ~
