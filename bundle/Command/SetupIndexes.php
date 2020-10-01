@@ -126,6 +126,15 @@ final class SetupIndexes extends Command
                 $io->writeln('replica '.$replica->getIndexName().' set');
                 $replica->setSettings(
                     [
+                        'searchableAttributes' => array_merge(
+                            $customSearchableattributes,
+                            $this->configResolver->getParameter(
+                                'searchable_attributes',
+                                Configuration::NAMESPACE
+                            )
+                        ),
+                        'attributesForFaceting' => $attributesForFaceting,
+                        'attributesToRetrieve' => ['*'],
                         'ranking' => array_merge(
                             [$replicaItem['condition']],
                             [

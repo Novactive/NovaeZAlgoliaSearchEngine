@@ -23,9 +23,9 @@ list:
 	@echo "${RED}==============================${RESTORE}"
 
 .PHONY: installez
-installez: ## Install eZ as the local project
+installez:  ## Install eZ as the local project
 	@docker run -d -p 3355:3306 --name $(DOCKER_DB_CONTAINER) -e MYSQL_ROOT_PASSWORD=ezplatform mariadb:10.3
-	@composer create-project ezsystems/ezplatform-ee --prefer-dist --no-progress --no-interaction --no-scripts --repository=https://updates.ez.no/bul/  $(EZ_DIR)
+	@COMPOSER_MEMORY_LIMIT=-1 composer create-project ezsystems/ezplatform-ee --prefer-dist --no-progress --no-interaction --no-scripts --repository=https://updates.ez.no/bul/  $(EZ_DIR)
 	@curl -o tests/provisioning/wrap.php https://raw.githubusercontent.com/Plopix/symfony-bundle-app-wrapper/master/wrap-bundle.php
 	@WRAP_APP_DIR=./ezplatform WRAP_BUNDLE_DIR=./ php tests/provisioning/wrap.php
 	@rm tests/provisioning/wrap.php

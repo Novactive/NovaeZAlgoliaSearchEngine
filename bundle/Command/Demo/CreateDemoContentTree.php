@@ -431,9 +431,8 @@ class CreateDemoContentTree extends Command
                     uniqid($content['type'].'-', false)
                 );
                 unlink($filePath);
+                $this->io->progressAdvance(1);
             }
-
-            $this->io->progressAdvance(1);
         }
     }
 
