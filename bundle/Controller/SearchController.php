@@ -34,6 +34,18 @@ class SearchController
     ): array {
         $query = $searchQueryFactory->create();
 
+        $query->setFacets(
+            array_map(
+                static function ($attribute) use ($translator) {
+                    return [
+                        'key' => $attribute,
+                        'label' => $translator->trans("facet.{$attribute}", [], 'novaezalgolia')
+                    ];
+                },
+                $query->getFacets()
+            )
+        );
+
         return [
             'query' => $serializer->serialize($query, 'json'),
             'replicas' => array_map(

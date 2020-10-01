@@ -70,10 +70,6 @@ abstract class AbstractResultsExtractor implements ResultExtractor
             try {
                 $searchResultHit = new SearchHit();
                 $searchResultHit->valueObject = $this->loadValueObject($hit);
-                // TODO: Adapt \eZ\Publish\API\Repository\Tests\SearchServiceTranslationLanguageFallbackTest::getIndexesToMatchData
-                //$resultHit->index = $hit['_index'];
-                // unrecognized field
-                //$searchResultHit->score = $hit['_score'];
                 $searchResultHit->matchedTranslation = $hit[self::MATCHED_TRANSLATION_FIELD];
 
                 yield $searchResultHit;

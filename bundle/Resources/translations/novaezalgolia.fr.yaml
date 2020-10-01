@@ -22,3 +22,4 @@ sort_by_path_string_id_asc: Path String Asc
 sort_by_path_string_id_desc: Path String Desc
 sort_by_invisible_b_asc: Invisible Asc
 sort_by_invisible_b_desc: Invisible Desc
+facet.content_type_name_s: Nom du Type de Contenu

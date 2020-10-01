@@ -32,6 +32,7 @@ use eZ\Publish\SPI\Search\FieldType\MultipleStringField;
 use eZ\Publish\SPI\Search\FieldType\StringField;
 use Iterator;
 use Novactive\Bundle\eZAlgoliaSearchEngine\DependencyInjection\Configuration;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Event\ContentNotSearchableFieldSkipEvent;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Event\ContentIndexCreateEvent;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Event\LocationIndexCreateEvent;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\Document as BaseDocument;
@@ -438,8 +439,11 @@ final class Converter
         );
     }
 
-    private function addContentTranslationDataFields(Document $document, Content $content, string $languageCode): void
-    {
+    private function addContentTranslationDataFields(
+        BaseDocument $document,
+        Content $content,
+        string $languageCode
+    ): void {
         $contentType = $this->persistenceHandler->contentTypeHandler()->load(
             $content->versionInfo->contentInfo->contentTypeId
         );
@@ -450,6 +454,9 @@ final class Converter
             }
 
             foreach ($contentType->fieldDefinitions as $fieldDefinition) {
+                $this->eventDispatcher->dispatch(
+                    new ContentNotSearchableFieldSkipEvent($content, $field, $fieldDefinition, $document)
+                );
                 if ($fieldDefinition->id !== $field->fieldDefinitionId || !$fieldDefinition->isSearchable) {
                     continue;
                 }

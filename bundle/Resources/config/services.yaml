@@ -198,3 +198,9 @@ services:
     Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\ResultExtractor\FacetResultExtractor\ContentTypeResultExtractor:
         tags:
             - { name: ezplatform.search.algolia.query.facet_result_extractor }
+
+    Novactive\Bundle\eZAlgoliaSearchEngine\Listener\ContentNotSearchableFieldSkipped:
+        arguments:
+            $imageVariationHandler: '@ezpublish.fieldType.ezimage.variation_service'
+        tags:
+            - { name: kernel.event_listener, event: Novactive\Bundle\eZAlgoliaSearchEngine\Event\ContentNotSearchableFieldSkipEvent, method: 'beforeFieldSkipped' }

@@ -109,11 +109,11 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
                     </div>
                     <div className='row'>
                         <div className='col-3'>
-                            {queryParameters.facets.map(attr => (
+                            {queryParameters.facets.map(item => (
                                 <div
                                     className='accordion'
                                     id='customRefinementList'
-                                    key={attr}
+                                    key={item.key}
                                 >
                                     <div className='card'>
                                         <div
@@ -129,7 +129,7 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
                                                     aria-expanded='true'
                                                     aria-controls='collapseOne'
                                                 >
-                                                    {facetLabel(attr)}
+                                                    <h5 className={'mb-0'}><span className="badge badge-primary">{item.label}</span></h5>
                                                 </button>
                                             </h2>
                                         </div>
@@ -141,10 +141,7 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
                                             data-parent='#customRefinementList'
                                         >
                                             <div className='card-body'>
-                                                <CustomRefinementList
-                                                    attribute={attr}
-                                                    key={attr}
-                                                />
+                                                <CustomRefinementList attribute={item.key}/>
                                             </div>
                                         </div>
                                     </div>
@@ -224,7 +221,7 @@ const SortBy = ({ items, refine, currentRefinement, createURL }) => {
     return (
         <div className='dropdown'>
             <a
-                className='btn btn-secondary dropdown-toggle'
+                className='btn btn-info dropdown-toggle'
                 href='#'
                 role='button'
                 id='sortByLink'
