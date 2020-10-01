@@ -60,7 +60,9 @@ class Query
      */
     private $requestOptions;
 
-    public const DEFAULT_FACETS = ['content_type_name_s'];
+    private const DEFAULT_FILTERS = 'doc_type_s:"location"';
+
+    private const DEFAULT_FACETS = ['content_type_name_s'];
 
     public function __construct(
         string $language,
@@ -136,6 +138,10 @@ class Query
      */
     public function getFiltersString(): string
     {
+        if (0 === count($this->filters)) {
+            return self::DEFAULT_FILTERS;
+        }
+
         return implode(' AND ', $this->filters);
     }
 

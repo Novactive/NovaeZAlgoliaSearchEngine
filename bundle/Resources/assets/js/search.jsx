@@ -5,13 +5,14 @@ import algoliasearch from 'algoliasearch/lite';
 import {
     InstantSearch,
     Configure,
-    SearchBox,
-    Hits,
+    connectSearchBox,
+    connectHits,
     Stats,
-    HitsPerPage,
+    connectHitsPerPage,
     connectPagination,
-    SortBy,
-    RefinementList
+    connectSortBy,
+    Highlight,
+    connectRefinementList
 } from 'react-instantsearch-dom';
 
 const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
@@ -32,9 +33,29 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
         return indexName;
     };
 
+    const sortByItems = (indexName, replicas) => {
+        const items = [{ value: indexName, label: 'Default' }];
+        for (const index in replicas) {
+            items.push({
+                value: indexName + '-' + replicas[index].key,
+                label: replicas[index].label
+            });
+        }
+        return items;
+    };
+
+    const facetLabel = attr => {
+        let i;
+        const frags = attr.split('_');
+        frags.pop();
+        for (i = 0; i < frags.length; i++) {
+            frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
+        }
+        return frags.join(' ');
+    };
+
     return (
         <div>
-            <h3>{queryParameters.language}</h3>
             <InstantSearch
                 searchClient={searchClient}
                 indexName={fullIndexName(indexName, queryParameters.replica)}
@@ -46,139 +67,291 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
                     query={queryParameters.term}
                     filters={queryParameters.filtersString}
                 />
-                <table cellSpacing={'10px'}>
-                    <tbody>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td>
-                                <Stats />
-                            </td>
-                            <td>
-                                <SearchBox />
-                            </td>
-                            <td>
-                                <CustomHitsPerPage
-                                    hitsPerPage={queryParameters.hitsPerPage}
-                                />
-                            </td>
-                            <td>
-                                <CustomSorting
-                                    indexName={indexName}
-                                    replicas={JSON.parse(replicas)}
-                                    fullIndexName={fullIndexName(
-                                        indexName,
-                                        queryParameters.replica
-                                    )}
-                                />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style={{ paddingRight: '30px' }}>
-                                <CustomFacets facets={queryParameters.facets} />
-                            </td>
-                            <td colSpan={4}>
-                                <Hits hitComponent={Hit} />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td colSpan={4}>
-                                <CustomPagination />
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div className='container pt-5'>
+                    <div className='row'>
+                        <div className='col-3'>
+                            <h3>
+                                Language:{' '}
+                                <span className='badge badge-secondary'>
+                                    {queryParameters.language}
+                                </span>
+                            </h3>
+                            <Stats />
+                        </div>
+                        <div className='col-3'>
+                            <CustomSearchBox />
+                        </div>
+                        <div className='col-3'>
+                            <CustomHitsPerPage
+                                defaultRefinement={queryParameters.hitsPerPage}
+                                items={[
+                                    {
+                                        value: queryParameters.hitsPerPage,
+                                        label:
+                                            queryParameters.hitsPerPage +
+                                            ' hits per page'
+                                    }
+                                ]}
+                            />
+                        </div>
+                        <div className='col-3'>
+                            <CustomSortBy
+                                defaultRefinement={fullIndexName(
+                                    indexName,
+                                    queryParameters.replica
+                                )}
+                                items={sortByItems(
+                                    indexName,
+                                    JSON.parse(replicas)
+                                )}
+                            />
+                        </div>
+                    </div>
+                    <div className='row'>
+                        <div className='col-3'>
+                            {queryParameters.facets.map(attr => (
+                                <div
+                                    className='accordion'
+                                    id='customRefinementList'
+                                    key={attr}
+                                >
+                                    <div className='card'>
+                                        <div
+                                            className='card-header'
+                                            id='headingOne'
+                                        >
+                                            <h2 className='mb-0'>
+                                                <button
+                                                    className='btn btn-link btn-block text-left font-weight-bold'
+                                                    type='button'
+                                                    data-toggle='collapse'
+                                                    data-target='#collapseOne'
+                                                    aria-expanded='true'
+                                                    aria-controls='collapseOne'
+                                                >
+                                                    {facetLabel(attr)}
+                                                </button>
+                                            </h2>
+                                        </div>
+
+                                        <div
+                                            id='collapseOne'
+                                            className='collapse show'
+                                            aria-labelledby='headingOne'
+                                            data-parent='#customRefinementList'
+                                        >
+                                            <div className='card-body'>
+                                                <CustomRefinementList
+                                                    attribute={attr}
+                                                    key={attr}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className='col-9'>
+                            <CustomHits />
+                        </div>
+                    </div>
+                    <div className='row'>
+                        <div className='col-3'>&nbsp;</div>
+                        <div className='col-9'>
+                            <CustomPagination />
+                        </div>
+                    </div>
+                </div>
             </InstantSearch>
         </div>
     );
 };
 
-const CustomHitsPerPage = ({ hitsPerPage }) => {
-    const items = [
-        { value: hitsPerPage, label: hitsPerPage + ' hits per page' }
-    ];
-    const biggerValue = hitsPerPage * 2;
+const HitsPerPage = ({ items, currentRefinement, refine, createURL }) => {
+    const defaultValue = items[0].value;
+    const biggerValue = defaultValue * 2;
     items.unshift({
         value: biggerValue,
         label: biggerValue + ' hits per page'
     });
-    if (hitsPerPage > 1) {
-        const lessValue = Math.floor(hitsPerPage / 2);
+    if (defaultValue > 1) {
+        const lessValue = Math.floor(defaultValue / 2);
         items.push({ value: lessValue, label: lessValue + ' hits per page' });
-    }
-    return <HitsPerPage defaultRefinement={hitsPerPage} items={items} />;
-};
-
-const CustomSorting = ({ indexName, replicas, fullIndexName }) => {
-    const items = [{ value: indexName, label: 'Default' }];
-    for (const index in replicas) {
-        items.push({
-            value: indexName + '-' + replicas[index].key,
-            label: replicas[index].label
-        });
     }
 
     return (
-        <>
-            <div style={{ float: 'left' }}>Sort By:</div>
-            <div style={{ float: 'left' }}>
-                <SortBy defaultRefinement={fullIndexName} items={items} />
+        <div className='dropdown'>
+            <a
+                className='btn btn-secondary dropdown-toggle'
+                href='#'
+                role='button'
+                id='hitsPerPageLink'
+                data-toggle='dropdown'
+                aria-haspopup='true'
+                aria-expanded='false'
+            >
+                {currentRefinement + ' hits per page'}
+            </a>
+            <div className='dropdown-menu' aria-labelledby='hitsPerPageLink'>
+                {items.map(item => (
+                    <a
+                        key={item.value}
+                        className={'dropdown-item'}
+                        href={createURL(item.value)}
+                        onClick={event => {
+                            event.preventDefault();
+                            refine(item.value);
+                        }}
+                    >
+                        {item.label}
+                    </a>
+                ))}
             </div>
-        </>
+        </div>
     );
 };
 
-const CustomFacets = ({ facets }) => {
-    return facets.map(attr => {
-        let i;
-        const frags = attr.split('_');
-        frags.pop();
-        for (i = 0; i < frags.length; i++) {
-            frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
+const CustomHitsPerPage = connectHitsPerPage(HitsPerPage);
+
+const SortBy = ({ items, refine, currentRefinement, createURL }) => {
+    let currentLabel = items[0].label;
+    items.map(item => {
+        if (item.value === currentRefinement) {
+            currentLabel = item.label;
         }
-        const label = frags.join(' ');
-        return (
-            <React.Fragment key={attr}>
-                <h5>{label}</h5>
-                <RefinementList attribute={attr} />
-            </React.Fragment>
-        );
     });
-};
 
-const Hit = ({ hit }) => <p>{hit.content_name_s}</p>;
-
-const Pagination = ({ currentRefinement, nbPages, refine, createURL }) => (
-    <ul style={{ paddingLeft: 0 }}>
-        {new Array(nbPages).fill(null).map((_, index) => {
-            const page = index + 1;
-            const linkStyle = {
-                fontWeight: currentRefinement === page ? 'bold' : ''
-            };
-
-            return (
-                <li
-                    key={index}
-                    style={{
-                        listStyleType: 'none',
-                        float: 'left',
-                        marginRight: '5px'
-                    }}
-                >
+    return (
+        <div className='dropdown'>
+            <a
+                className='btn btn-secondary dropdown-toggle'
+                href='#'
+                role='button'
+                id='sortByLink'
+                data-toggle='dropdown'
+                aria-haspopup='true'
+                aria-expanded='false'
+            >
+                {currentLabel}
+            </a>
+            <div className='dropdown-menu' aria-labelledby='sortByLink'>
+                {items.map(item => (
                     <a
-                        href={createURL(page)}
-                        style={linkStyle}
+                        key={item.value}
+                        className={'dropdown-item'}
+                        href={createURL(item.value)}
                         onClick={event => {
                             event.preventDefault();
-                            refine(page);
+                            refine(item.value);
                         }}
                     >
-                        {page}
+                        {item.label}
                     </a>
-                </li>
-            );
-        })}
+                ))}
+            </div>
+        </div>
+    );
+};
+
+const CustomSortBy = connectSortBy(SortBy);
+
+const RefinementList = ({
+    items,
+    isFromSearch,
+    refine,
+    searchForItems,
+    createURL
+}) => (
+    <ul className={'list-group'}>
+        {items.map(item => (
+            <li key={item.label} className={'list-group-item'}>
+                <a
+                    href={createURL(item.value)}
+                    style={{ fontWeight: item.isRefined ? 'bold' : '' }}
+                    onClick={event => {
+                        event.preventDefault();
+                        refine(item.value);
+                    }}
+                >
+                    {isFromSearch ? (
+                        <Highlight attribute='label' hit={item} />
+                    ) : (
+                        item.label
+                    )}{' '}
+                    ({item.count})
+                </a>
+            </li>
+        ))}
     </ul>
+);
+
+const CustomRefinementList = connectRefinementList(RefinementList);
+
+const Hit = ({ hit }) => (
+    <li className='list-group-item'>{hit.content_name_s}</li>
+);
+
+const Hits = ({ hits }) => (
+    <ul className='list-group'>
+        {hits.map(hit => (
+            <Hit key={hit.objectID} hit={hit} />
+        ))}
+    </ul>
+);
+
+const CustomHits = connectHits(Hits);
+
+const SearchBox = ({ currentRefinement, isSearchStalled, refine }) => (
+    <form noValidate action='' role='search'>
+        <div className='form-group'>
+            <input
+                type={'search'}
+                value={currentRefinement}
+                className='form-control'
+                onChange={event => refine(event.currentTarget.value)}
+                placeholder='Search'
+                aria-label='Search'
+                aria-describedby='button-addon2'
+            />
+            {isSearchStalled ? 'My search is stalled' : ''}
+        </div>
+    </form>
+);
+
+const CustomSearchBox = connectSearchBox(SearchBox);
+
+const Pagination = ({ currentRefinement, nbPages, refine, createURL }) => (
+    <nav aria-label='Page navigation'>
+        <ul className='pagination mt-3'>
+            {new Array(nbPages).fill(null).map((_, index) => {
+                const page = index + 1;
+
+                return (
+                    <li
+                        key={index}
+                        className={
+                            'page-item' +
+                            (currentRefinement === page && ' active')
+                        }
+                        {...(currentRefinement === page && {
+                            'aria-current': 'page'
+                        })}
+                    >
+                        <a
+                            href={createURL(page)}
+                            className={'page-link'}
+                            onClick={event => {
+                                event.preventDefault();
+                                refine(page);
+                            }}
+                        >
+                            {page}
+                        </a>
+                    </li>
+                );
+            })}
+        </ul>
+    </nav>
 );
 
 const CustomPagination = connectPagination(Pagination);
