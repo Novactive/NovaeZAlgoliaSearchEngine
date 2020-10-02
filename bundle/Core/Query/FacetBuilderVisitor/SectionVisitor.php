@@ -12,15 +12,15 @@ declare(strict_types=1);
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\FacetBuilderVisitor;
 
 use eZ\Publish\API\Repository\Values\Content\Query\FacetBuilder;
-use eZ\Publish\API\Repository\Values\Content\Query\FacetBuilder\ContentTypeFacetBuilder;
+use eZ\Publish\API\Repository\Values\Content\Query\FacetBuilder\SectionFacetBuilder;
 
-final class ContentTypeVisitor extends AbstractTermsVisitor
+final class SectionVisitor extends AbstractTermsVisitor
 {
-    public const FACET_ATTRIBUTE = 'content_type_name_s';
+    public const FACET_ATTRIBUTE = 'section_name_s';
 
     public function supports(FacetBuilder $builder): bool
     {
-        return $builder instanceof ContentTypeFacetBuilder;
+        return $builder instanceof SectionFacetBuilder;
     }
 
     protected function getTargetField(FacetBuilder $builder): string

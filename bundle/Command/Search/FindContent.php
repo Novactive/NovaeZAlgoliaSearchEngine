@@ -54,10 +54,11 @@ final class FindContent extends Command
         $io = new SymfonyStyle($input, $output);
 
         $query = new Query();
-        $query->limit = 5;
-        $query->filter = new Criterion\ContentTypeIdentifier('custom_type');
+        $query->limit = 15;
+        $query->filter = new Criterion\SectionId(1);
 
-        $query->facetBuilders[] = new Query\FacetBuilder\ContentTypeFacetBuilder(['name' => 'ContentType']);
+        $query->facetBuilders[] = new Query\FacetBuilder\ContentTypeFacetBuilder();
+        $query->facetBuilders[] = new Query\FacetBuilder\SectionFacetBuilder(['name' => 'Section']);
         $query->sortClauses = [new Query\SortClause\ContentId()];
 
         $result = $this->repository->getSearchService()->findContent($query);
@@ -80,6 +81,7 @@ final class FindContent extends Command
                     foreach ($facet->entries as $facetEntry => $number) {
                         $output->writeln("{$facetEntry} => {$number}");
                     }
+                    $io->newLine();
                 }
             }
             $io->newLine();

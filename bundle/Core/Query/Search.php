@@ -121,7 +121,7 @@ final class Search
                     )
                 ).')';
         }
-dump($filters);
+
         $requestOptions = [
             'filters' => $filters,
             'attributesToHighlight' => [],

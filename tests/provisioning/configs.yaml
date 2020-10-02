@@ -17,11 +17,12 @@ framework:
             nova_ezalgolia:
                 json_manifest_path: '%kernel.project_dir%/public/assets/nova_ezalgolia/build/manifest.json'
 
-system:
-    site_group:
-        search_view:
-            full:
-                ezplatform_admin_ui:
-                    controller: 'Novactive\Bundle\eZAlgoliaSearchEngine\Controller\SearchController:searchAction'
-                    template: '@ezdesign/ui/search/index.html.twig'
-                    match: true
+ezplatform:
+    system:
+        site_group:
+            search_view:
+                full:
+                    ezplatform_admin_ui:
+                        controller: 'Novactive\Bundle\eZAlgoliaSearchEngine\Controller\SearchController:searchAction'
+                        template: '@ezdesign/ui/search/algolia.html.twig'
+                        match: true

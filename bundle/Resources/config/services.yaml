@@ -114,6 +114,11 @@ services:
             - { name: ezplatform.search.algolia.query.content.facet_builder_visitor }
             - { name: ezplatform.search.algolia.query.location.facet_builder_visitor }
 
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\FacetBuilderVisitor\SectionVisitor:
+        tags:
+            - { name: ezplatform.search.algolia.query.content.facet_builder_visitor }
+            - { name: ezplatform.search.algolia.query.location.facet_builder_visitor }
+
     ezplatform.search.algolia.query.content.facet_builder_visitor.dispatcher:
         class: Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\FacetBuilderVisitor\DispatcherVisitor
         arguments:
@@ -215,6 +220,10 @@ services:
             $extractors: !tagged_iterator ezplatform.search.algolia.query.facet_result_extractor
 
     Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\ResultExtractor\FacetResultExtractor\ContentTypeResultExtractor:
+        tags:
+            - { name: ezplatform.search.algolia.query.facet_result_extractor }
+
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\ResultExtractor\FacetResultExtractor\SectionResultExtractor:
         tags:
             - { name: ezplatform.search.algolia.query.facet_result_extractor }
 
