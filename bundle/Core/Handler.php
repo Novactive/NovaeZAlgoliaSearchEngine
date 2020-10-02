@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core;
 
+use Algolia\AlgoliaSearch\SearchIndex;
 use Exception;
 use eZ\Publish\API\Repository\LanguageService;
 use eZ\Publish\API\Repository\Values\Content\LocationQuery;
@@ -23,6 +24,8 @@ use eZ\Publish\Core\Base\Exceptions\NotFoundException;
 use eZ\Publish\SPI\Persistence\Content;
 use eZ\Publish\SPI\Persistence\Content\Location;
 use eZ\Publish\Core\Search\Legacy\Content\Handler as LegacyHandler;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Core\DataCollector\Log;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Core\DataCollector\Logger;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\Search;
 use Psr\Log\LoggerInterface;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\ParametersResolver;
@@ -87,6 +90,11 @@ class Handler extends LegacyHandler
     private $contentTypeService;
 
     /**
+     * @var Logger
+     */
+    private $collector;
+
+    /**
      * @required
      */
     public function setServices(
@@ -100,7 +108,8 @@ class Handler extends LegacyHandler
         LoggerInterface $logger,
         ParametersResolver $parametersResolver,
         ContentService $contentService,
-        ContentTypeService $contentTypeService
+        ContentTypeService $contentTypeService,
+        Logger $collector
     ): void {
         $this->client = $client;
         $this->converter = $converter;
@@ -113,6 +122,7 @@ class Handler extends LegacyHandler
         $this->parametersResolver = $parametersResolver;
         $this->contentService = $contentService;
         $this->contentTypeService = $contentTypeService;
+        $this->collector = $collector;
     }
 
     public function indexContent(Content $content): void
@@ -175,14 +185,35 @@ class Handler extends LegacyHandler
 
     public function reindex(string $languageCode, array $objects): void
     {
-        $this->client->getIndex($languageCode)->saveObjects($objects);
+        $mode = AlgoliaClient::CLIENT_ADMIN_MODE;
+        ($this->client)(
+            function (SearchIndex $index) use ($objects, $mode, $languageCode) {
+                $start = microtime(true);
+                $index->saveObjects($objects);
+                $this->collector->addSave($mode, $languageCode, $index->getIndexName(), $objects)->startTime($start);
+            },
+            $languageCode,
+            $mode
+        );
     }
 
     public function deleteContent($contentId, $versionId = null): void
     {
+        $mode = AlgoliaClient::CLIENT_ADMIN_MODE;
         foreach ($this->languageService->loadLanguages() as $language) {
-            $this->client->getIndex($language->languageCode)->deleteObject(
-                $this->documentIdGenerator->generateContentDocumentId((int) $contentId, $language->languageCode)
+            ($this->client)(
+                function (SearchIndex $index) use ($contentId, $language, $mode) {
+                    $object = $this->documentIdGenerator->generateContentDocumentId(
+                        (int) $contentId,
+                        $language->languageCode
+                    );
+                    $start = microtime(true);
+                    $index->deleteObject($object);
+                    $this->collector->addDelete($mode, $language->languageCode, $index->getIndexName(), [$object])
+                                    ->startTime($start);
+                },
+                $language->languageCode,
+                $mode
             );
         }
 
@@ -191,9 +222,21 @@ class Handler extends LegacyHandler
 
     public function deleteLocation($locationId, $versionId = null): void
     {
+        $mode = AlgoliaClient::CLIENT_ADMIN_MODE;
         foreach ($this->languageService->loadLanguages() as $language) {
-            $this->client->getIndex($language->languageCode)->deleteObject(
-                $this->documentIdGenerator->generateLocationDocumentId((int) $locationId, $language->languageCode)
+            ($this->client)(
+                function (SearchIndex $index) use ($language, $locationId, $mode) {
+                    $object = $this->documentIdGenerator->generateLocationDocumentId(
+                        (int) $locationId,
+                        $language->languageCode
+                    );
+                    $start = microtime(true);
+                    $index->deleteObject($object);
+                    $this->collector->addDelete($mode, $language->languageCode, $index->getIndexName(), [$object])
+                                    ->startTime($start);
+                },
+                $language->languageCode,
+
             );
         }
 
@@ -202,8 +245,17 @@ class Handler extends LegacyHandler
 
     public function purgeIndex(): void
     {
+        $mode = AlgoliaClient::CLIENT_ADMIN_MODE;
         foreach ($this->languageService->loadLanguages() as $language) {
-            $this->client->getIndex($language->languageCode)->clearObjects();
+            ($this->client)(
+                function (SearchIndex $index) use ($mode) {
+                    $start = microtime(true);
+                    $index->clearObjects();
+                    $this->collector->addPurge($mode, $index->getIndexName())->startTime($start);
+                },
+                $language->languageCode,
+                $mode
+            );
         }
 
         parent::purgeIndex();

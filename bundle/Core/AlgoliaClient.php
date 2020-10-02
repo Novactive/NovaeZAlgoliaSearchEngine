@@ -22,6 +22,14 @@ use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
 
 final class AlgoliaClient
 {
+    public const CLIENT_ADMIN_MODE = 'admin';
+    public const CLIENT_SEARCH_MODE = 'search';
+
+    public const CLIENT_MODES = [
+        self::CLIENT_ADMIN_MODE,
+        self::CLIENT_SEARCH_MODE,
+    ];
+
     /**
      * @var array
      */
@@ -69,8 +77,7 @@ final class AlgoliaClient
         ];
     }
 
-    public function getIndex(string $languageCode, string $mode = 'admin', ?string $replicaSuffix = null): SearchIndex
-    {
+    private function getIndex(string $languageCode, string $mode, ?string $replicaSuffix = null): SearchIndex {
         $indexName = $this->config['index_name_prefix'].'-'.$languageCode;
 
         if (null !== $replicaSuffix) {
@@ -81,14 +88,24 @@ final class AlgoliaClient
             return $this->indexes[$indexName];
         }
 
-        if (!\in_array($mode, ['admin', 'search'], true)) {
+        if (!\in_array($mode, self::CLIENT_MODES, true)) {
             throw new InvalidArgumentException('$mode', 'The Index mode must either "admin" or "search".');
         }
-        $apiKey = ('admin' === $mode) ? $this->config['api_secret_key'] : $this->getSecuredApiKey();
+        $apiKey = (self::CLIENT_ADMIN_MODE === $mode) ? $this->config['api_secret_key'] : $this->getSecuredApiKey();
         $client = SearchClient::create($this->config['app_id'], $apiKey);
         $this->indexes[$indexName] = $client->initIndex($indexName);
 
         return $this->indexes[$indexName];
+    }
+
+    public function __invoke(
+        callable $callback,
+        string $languageCode,
+        string $mode = self::CLIENT_SEARCH_MODE,
+        ?string $replicaSuffix = null
+    ) {
+        $index = $this->getIndex($languageCode, $mode, $replicaSuffix);
+        return $callback($index);
     }
 
     public function getSecuredApiKey(): string

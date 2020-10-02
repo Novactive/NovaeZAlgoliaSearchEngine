@@ -9,4 +9,12 @@ services:
     Novactive\Bundle\eZExtraBundle\Core\Manager\eZ\ContentType: ~
     Novactive\Bundle\eZExtraBundle\Core\Helper\eZ\Content: ~
 
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\DataCollector\MainCollector:
+        tags:
+            -
+                name:     data_collector
+                template: '@ezdesign/data_collector/main.html.twig'
+                id:       'nova.ez.algolia.collector'
 
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\DataCollector\Logger:
+        $enabled: true

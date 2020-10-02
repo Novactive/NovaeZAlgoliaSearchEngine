@@ -11,7 +11,9 @@ declare(strict_types=1);
 
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query;
 
+use Algolia\AlgoliaSearch\SearchIndex;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\AttributeGenerator;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Core\DataCollector\Logger;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\FullTextVisitor;
 use Novactive\Bundle\eZAlgoliaSearchEngine\DependencyInjection\Configuration;
 use RuntimeException;
@@ -62,6 +64,11 @@ final class Search
      */
     private $configResolver;
 
+    /**
+     * @var Logger
+     */
+    private $collector;
+
     public function __construct(
         AlgoliaClient $client,
         AttributeGenerator $attributeGenerator,
@@ -69,7 +76,8 @@ final class Search
         FacetBuilderVisitor $dispatcherFacetVisitor,
         CriterionVisitor $dispatcherCriterionVisitor,
         SortClauseVisitor $dispatcherSortClauseVisitor,
-        ConfigResolverInterface $configResolver
+        ConfigResolverInterface $configResolver,
+        Logger $collector
     ) {
         $this->client = $client;
         $this->attributeGenerator = $attributeGenerator;
@@ -78,6 +86,7 @@ final class Search
         $this->dispatcherCriterionVisitor = $dispatcherCriterionVisitor;
         $this->dispatcherSortClauseVisitor = $dispatcherSortClauseVisitor;
         $this->configResolver = $configResolver;
+        $this->collector = $collector;
     }
 
     public function execute(Query $query, string $docType, array $languageFilter): SearchResult
@@ -141,7 +150,28 @@ final class Search
         string $query = '',
         array $requestOptions = []
     ): array {
-        return $this->client->getIndex($languageCode, 'search', $replaicaName)->search($query, $requestOptions);
+
+        $mode = AlgoliaClient::CLIENT_SEARCH_MODE;
+
+        return ($this->client)(
+            function (SearchIndex $index) use ($query, $requestOptions, $languageCode, $mode) {
+                $start = microtime(true);
+                $results = $index->search($query, $requestOptions);
+                $this->collector->addSearch(
+                    $mode,
+                    $languageCode,
+                    $index->getIndexName(),
+                    $query,
+                    $requestOptions,
+                    $results
+                )->startTime($start);
+
+                return $results;
+            },
+            $languageCode,
+            $mode,
+            $replaicaName
+        );
     }
 
     public function getExtractedSearchResult(
