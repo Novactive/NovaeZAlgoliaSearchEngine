@@ -13,7 +13,7 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor;
 
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\Contracts\CommonVisitor;
-use RuntimeException;
+use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
 
 final class DateMetadataVisitor implements CriterionVisitor
 {
@@ -22,19 +22,19 @@ final class DateMetadataVisitor implements CriterionVisitor
     public function supports(Criterion $criterion): bool
     {
         return $criterion instanceof Criterion\DateMetadata &&
-            \in_array(
-                $criterion->operator,
-                [
-                    Criterion\Operator::EQ,
-                    Criterion\Operator::IN,
-                    Criterion\Operator::LT,
-                    Criterion\Operator::LTE,
-                    Criterion\Operator::GT,
-                    Criterion\Operator::GTE,
-                    Criterion\Operator::BETWEEN
-                ],
-                true
-            );
+               \in_array(
+                   $criterion->operator,
+                   [
+                       Criterion\Operator::EQ,
+                       Criterion\Operator::IN,
+                       Criterion\Operator::LT,
+                       Criterion\Operator::LTE,
+                       Criterion\Operator::GT,
+                       Criterion\Operator::GTE,
+                       Criterion\Operator::BETWEEN
+                   ],
+                   true
+               );
     }
 
     public function visit(CriterionVisitor $dispatcher, Criterion $criterion, string $additionalOperators = ''): string
@@ -50,7 +50,10 @@ final class DateMetadataVisitor implements CriterionVisitor
             case Criterion\DateMetadata::MODIFIED:
                 return 'content_modification_date_timestamp_i';
             default:
-                throw new RuntimeException("Unsupported DateMetadata criterion target {$criterion->value}");
+                throw new InvalidArgumentException(
+                    'target',
+                    "Unsupported DateMetadata criterion target {$criterion->target}"
+                );
         }
     }
 }

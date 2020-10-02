@@ -33,8 +33,8 @@ final class FieldEmptyVisitor implements CriterionVisitor, FieldInterface
 
         if (empty($searchFields)) {
             throw new InvalidArgumentException(
-                '$criterion->target',
-                "No searchable fields found for the given criterion target '{$criterion->target}'."
+                'fieldDefinitionIdentifier',
+                "No searchable fields found for the given Criterion target '{$criterion->target}'."
             );
         }
 

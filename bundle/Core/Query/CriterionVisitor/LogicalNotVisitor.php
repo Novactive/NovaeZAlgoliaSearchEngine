@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor;
 
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
-use RuntimeException;
+use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
 
 final class LogicalNotVisitor implements CriterionVisitor
 {
@@ -25,7 +25,7 @@ final class LogicalNotVisitor implements CriterionVisitor
     {
         /** @var Criterion\LogicalNot $criterion */
         if (\count($criterion->criteria) !== 1) {
-            throw new RuntimeException('Invalid aggregation in LogicalNot criterion.');
+            throw new InvalidArgumentException('criterion', 'Invalid aggregation in LogicalNot criterion.');
         }
 
         if ($criterion->criteria[0] instanceof Criterion\LogicalAnd) {
@@ -33,11 +33,15 @@ final class LogicalNotVisitor implements CriterionVisitor
             // https://www.algolia.com/doc/api-reference/api-parameters/filters/#boolean-operators
             $docRef = 'Check out the reference of Algolia boolean operators: ';
             $docRef .= 'https://www.algolia.com/doc/api-reference/api-parameters/filters/#boolean-operators';
-            throw new RuntimeException('AND operator cannot be inside LogicalNot criterion. '.$docRef);
+            throw new InvalidArgumentException(
+                'criterion',
+                'AND operator cannot be inside LogicalNot criterion. '.$docRef
+            );
         }
 
         if ($criterion->criteria[0] instanceof Criterion\FullText) {
-            throw new RuntimeException(
+            throw new InvalidArgumentException(
+                'criterion',
                 "FullText Criterion cannot be inside LogicalNot operator ".
                 "because it's moved to the query string of the Algolia request which is performed anyway."
             );

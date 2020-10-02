@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor;
 
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
-use RuntimeException;
+use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
 
 final class LogicalAndVisitor implements CriterionVisitor
 {
@@ -25,7 +25,7 @@ final class LogicalAndVisitor implements CriterionVisitor
     {
         /** @var Criterion\LogicalAnd $criterion */
         if (empty($criterion->criteria)) {
-            throw new RuntimeException('Invalid aggregation in LogicalAnd criterion.');
+            throw new InvalidArgumentException('criterion', 'Invalid aggregation in LogicalAnd criterion.');
         }
 
         $subCriteria = array_map(

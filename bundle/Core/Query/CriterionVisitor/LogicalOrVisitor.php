@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor;
 
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
-use RuntimeException;
+use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
 
 final class LogicalOrVisitor implements CriterionVisitor
 {
@@ -25,7 +25,7 @@ final class LogicalOrVisitor implements CriterionVisitor
     {
         /** @var Criterion\LogicalOr $criterion */
         if (empty($criterion->criteria)) {
-            throw new RuntimeException('Invalid aggregation in LogicalOr criterion.');
+            throw new InvalidArgumentException('criterion', 'Invalid aggregation in LogicalOr criterion.');
         }
 
         $subCriteria = array_map(
@@ -35,10 +35,14 @@ final class LogicalOrVisitor implements CriterionVisitor
                     // https://www.algolia.com/doc/api-reference/api-parameters/filters/#boolean-operators
                     $docRef = 'Check out the reference of Algolia boolean operators: ';
                     $docRef .= 'https://www.algolia.com/doc/api-reference/api-parameters/filters/#boolean-operators';
-                    throw new RuntimeException('AND/OR operator cannot be inside LogicalOr criterion. '.$docRef);
+                    throw new InvalidArgumentException(
+                        'criterion',
+                        'AND/OR operator cannot be inside LogicalOr criterion. '.$docRef
+                    );
                 }
                 if ($value instanceof Criterion\FullText) {
-                    throw new RuntimeException(
+                    throw new InvalidArgumentException(
+                        'criterion',
                         "FullText Criterion cannot be inside LogicalOr operator ".
                         "because it's moved to the query string of the Algolia request which is performed anyway."
                     );
