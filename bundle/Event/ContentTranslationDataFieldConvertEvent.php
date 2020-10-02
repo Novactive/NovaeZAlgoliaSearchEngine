@@ -16,7 +16,7 @@ use eZ\Publish\SPI\Persistence\Content\Field;
 use eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition;
 use eZ\Publish\SPI\Persistence\Content;
 
-final class ContentNotSearchableFieldSkipEvent extends DocumentCreateEvent
+final class ContentTranslationDataFieldConvertEvent extends DocumentCreateEvent
 {
     /**
      * @var Content

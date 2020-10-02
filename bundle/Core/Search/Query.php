@@ -62,7 +62,7 @@ class Query
 
     private const DEFAULT_FILTERS = 'doc_type_s:"location"';
 
-    private const DEFAULT_FACETS = ['content_type_name_s'];
+    private const DEFAULT_FACETS = ['content_type_name_s', 'section_name_s'];
 
     public function __construct(
         string $language,

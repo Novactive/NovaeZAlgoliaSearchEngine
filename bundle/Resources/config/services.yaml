@@ -23,6 +23,7 @@ services:
         resource: '../../Controller'
         tags: ['controller.service_arguments']
 
+
     Novactive\Bundle\eZAlgoliaSearchEngine\Mapping\ParametersResolver: ~
 
     Novactive\Bundle\eZAlgoliaSearchEngine\Core\:
@@ -221,4 +222,4 @@ services:
         arguments:
             $imageVariationHandler: '@ezpublish.fieldType.ezimage.variation_service'
         tags:
-            - { name: kernel.event_listener, event: Novactive\Bundle\eZAlgoliaSearchEngine\Event\ContentNotSearchableFieldSkipEvent, method: 'beforeFieldSkipped' }
+            - { name: kernel.event_listener, event: Novactive\Bundle\eZAlgoliaSearchEngine\Event\ContentTranslationDataFieldConvertEvent }

@@ -280,16 +280,47 @@ const RefinementList = ({
 
 const CustomRefinementList = connectRefinementList(RefinementList);
 
-const Hit = ({ hit }) => (
-    <li className='list-group-item'>{hit.content_name_s}</li>
-);
+const Hit = ({ hit }) => {
+    /**
+     * You may not have title_value_s and description_value_s
+     */
+    return (
+        <div className='card'>
+            <img
+                src={hit[hit.content_type_identifier_s + '_image_uri_s']}
+                className='card-img-top'
+                alt={hit[hit.content_type_identifier_s + '_title_value_s']}
+            />
+            <div className='card-body'>
+                <h5 className='card-title'>
+                    {hit[hit.content_type_identifier_s + '_title_value_s']}
+                </h5>
+                <p className='card-text'>
+                    {
+                        hit[
+                            hit.content_type_identifier_s +
+                                '_description_value_s'
+                        ]
+                    }
+                </p>
+                <p className='card-text'>
+                    <small className='text-muted'>
+                        Last updated {hit.content_modification_date_dt}
+                    </small>
+                </p>
+            </div>
+        </div>
+    );
+};
 
 const Hits = ({ hits }) => (
-    <ul className='list-group'>
+    <div className='row'>
         {hits.map(hit => (
-            <Hit key={hit.objectID} hit={hit} />
+            <div className='col-4 mb-4' key={hit.objectID}>
+                <Hit hit={hit} />
+            </div>
         ))}
-    </ul>
+    </div>
 );
 
 const CustomHits = connectHits(Hits);
