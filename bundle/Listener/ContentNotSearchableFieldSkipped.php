@@ -5,7 +5,7 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Listener;
 use eZ\Publish\SPI\Search\Field;
 use eZ\Publish\API\Repository\Values\Content\Field as ContentField;
 use eZ\Publish\SPI\Search\FieldType\StringField;
-use Novactive\Bundle\eZAlgoliaSearchEngine\Event\ContentNotSearchableFieldSkipEvent;
+use Novactive\Bundle\eZAlgoliaSearchEngine\Event\ContentTranslationDataFieldConvertEvent;
 use eZ\Bundle\EzPublishCoreBundle\Imagine\ImageAsset\AliasGenerator;
 use eZ\Publish\API\Repository\ContentService;
 
@@ -27,7 +27,7 @@ class ContentNotSearchableFieldSkipped
         $this->contentService = $contentService;
     }
 
-    public function beforeFieldSkipped(ContentNotSearchableFieldSkipEvent $event): void
+    public function __invoke(ContentTranslationDataFieldConvertEvent $event): void
     {
         $field = $event->getField();
         $fieldDefinition = $event->getFieldDefinition();

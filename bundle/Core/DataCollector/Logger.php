@@ -86,7 +86,7 @@ class Logger
         $log = new Log();
         $log->setMethod($mode);
         $log->setMethod('purge');
-        $log->setReplicaName($replicaName);
+        $log->setIndexName($replicaName);
         $this->logs[] = $log;
 
         return $this;

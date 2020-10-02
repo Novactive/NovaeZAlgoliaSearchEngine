@@ -94,6 +94,13 @@ class CreateDemoContentTree extends Command
                         'isSearchable' => true,
                         'isTranslatable' => true,
                     ],
+                    'description' => [
+                        'type' => 'ezrichtext',
+                        'name' => 'Description',
+                        'isRequired' => false,
+                        'isSearchable' => true,
+                        'isTranslatable' => true,
+                    ],
                     'price' => [
                         'type' => 'ezfloat',
                         'name' => 'Price',
@@ -101,7 +108,7 @@ class CreateDemoContentTree extends Command
                         'isSearchable' => false,
                         'isTranslatable' => true
                     ],
-                    'cover' => [
+                    'image' => [
                         'type' => 'ezimage',
                         'name' => 'Cover',
                         'isRequired' => false,
@@ -121,6 +128,13 @@ class CreateDemoContentTree extends Command
                         'type' => 'ezstring',
                         'name' => 'Title',
                         'isRequired' => true,
+                        'isSearchable' => true,
+                        'isTranslatable' => true,
+                    ],
+                    'description' => [
+                        'type' => 'ezrichtext',
+                        'name' => 'Description',
+                        'isRequired' => false,
                         'isSearchable' => true,
                         'isTranslatable' => true,
                     ],
@@ -145,7 +159,7 @@ class CreateDemoContentTree extends Command
                         'isSearchable' => false,
                         'isTranslatable' => true
                     ],
-                    'poster' => [
+                    'image' => [
                         'type' => 'ezimage',
                         'name' => 'Poster',
                         'isRequired' => false,
@@ -165,6 +179,13 @@ class CreateDemoContentTree extends Command
                         'type' => 'ezstring',
                         'name' => 'Title',
                         'isRequired' => true,
+                        'isSearchable' => true,
+                        'isTranslatable' => true,
+                    ],
+                    'description' => [
+                        'type' => 'ezrichtext',
+                        'name' => 'Description',
+                        'isRequired' => false,
                         'isSearchable' => true,
                         'isTranslatable' => true,
                     ],
@@ -189,7 +210,7 @@ class CreateDemoContentTree extends Command
                         'isSearchable' => false,
                         'isTranslatable' => true
                     ],
-                    'cover' => [
+                    'image' => [
                         'type' => 'ezimage',
                         'name' => 'Cover',
                         'isRequired' => false,
@@ -209,6 +230,13 @@ class CreateDemoContentTree extends Command
                         'type' => 'ezstring',
                         'name' => 'Title',
                         'isRequired' => true,
+                        'isSearchable' => true,
+                        'isTranslatable' => true,
+                    ],
+                    'description' => [
+                        'type' => 'ezrichtext',
+                        'name' => 'Description',
+                        'isRequired' => false,
                         'isSearchable' => true,
                         'isTranslatable' => true,
                     ],
@@ -272,7 +300,7 @@ class CreateDemoContentTree extends Command
                     ],
                     'description' => [
                         'type' => 'ezrichtext',
-                        'name' => 'Introduction',
+                        'name' => 'Description',
                         'isRequired' => false,
                         'isSearchable' => true,
                         'isTranslatable' => true,
@@ -291,7 +319,7 @@ class CreateDemoContentTree extends Command
                         'isSearchable' => false,
                         'isTranslatable' => true
                     ],
-                    'poster' => [
+                    'image' => [
                         'type' => 'ezimage',
                         'name' => 'Image',
                         'isRequired' => false,
@@ -364,36 +392,40 @@ class CreateDemoContentTree extends Command
                     'type' => 'novel',
                     'fields' => [
                         'title' => $faker->sentence(3),
+                        'description' => $this->wrapRichText($faker->sentence(10)),
                         'author' => $faker->sentence(2),
                         'annotation' => $this->wrapRichText($faker->sentence(10)),
                         'price' => $faker->randomFloat(2, 1, 9),
                     ],
-                    'imageField' => 'cover'
+                    'imageField' => 'image'
                 ],
                 [
                     'type' => 'film',
                     'fields' => [
                         'title' => $faker->sentence(3),
+                        'description' => $this->wrapRichText($faker->sentence(10)),
                         'director' => $faker->sentence(2),
                         'short_plot' => $this->wrapRichText($faker->sentence(10)),
                         'box_office' => $faker->randomFloat(2, 1000000, 9999999),
                     ],
-                    'imageField' => 'poster'
+                    'imageField' => 'image'
                 ],
                 [
                     'type' => 'album',
                     'fields' => [
                         'title' => $faker->sentence(3),
+                        'description' => $this->wrapRichText($faker->sentence(10)),
                         'musician' => $faker->sentence(2),
                         'songs' => $this->wrapRichText($faker->sentence(10)),
                         'price' => $faker->randomFloat(2, 10, 99),
                     ],
-                    'imageField' => 'cover'
+                    'imageField' => 'image'
                 ],
                 [
                     'type' => 'program',
                     'fields' => [
                         'title' => $faker->sentence(3),
+                        'description' => $this->wrapRichText($faker->sentence(10)),
                         'short_title' => $faker->sentence(2),
                         'intro' => $this->wrapRichText($faker->sentence(10)),
                         'body' => $this->wrapRichText($faker->sentence(20)),
@@ -410,7 +442,7 @@ class CreateDemoContentTree extends Command
                         'feedback' => $this->wrapRichText($faker->sentence(15)),
                         'rating' => $faker->randomFloat(1, 1, 5),
                     ],
-                    'imageField' => 'poster'
+                    'imageField' => 'image'
                 ],
             ];
 
@@ -438,8 +470,8 @@ class CreateDemoContentTree extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $contentCount = 5;
-        $this->io->progressStart(\count($this->contentTypes()) + $contentCount);
+        $contentCount = 50;
+        $this->io->progressStart(\count($this->contentTypes()) + \count($this->contentTypes()) * $contentCount);
         $this->createUpdateContentTypes();
 
         $parentLocation = (int) $input->getArgument('parentLocationId');
