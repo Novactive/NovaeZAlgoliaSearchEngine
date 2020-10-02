@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Command;
 
+use Algolia\AlgoliaSearch\SearchIndex;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\AlgoliaClient;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\AttributeGenerator;
 use Novactive\Bundle\eZAlgoliaSearchEngine\DependencyInjection\Configuration;
@@ -76,8 +77,6 @@ final class SetupIndexes extends Command
 
         foreach ($this->languageService->loadLanguages() as $language) {
 
-            $index = $this->client->getIndex($language->languageCode);
-
             $replicas = ParametersResolver::getReplicas(
                 $this->configResolver->getParameter(
                     'attributes_for_replicas',
@@ -98,54 +97,67 @@ final class SetupIndexes extends Command
                 )
             );
 
-            $index->setSettings(
-                [
-                    'searchableAttributes' => array_merge(
-                        $customSearchableattributes,
-                        $this->configResolver->getParameter(
-                            'searchable_attributes',
-                            Configuration::NAMESPACE
-                        )
-                    ),
-                    'attributesForFaceting' => $attributesForFaceting,
-                    'attributesToRetrieve' => ['*'],
-                    'replicas' => array_map(
-                        static function (string $suffix) use ($index) {
-                            return "{$index->getIndexName()}-{$suffix}";
-                        },
-                        array_column($replicas, 'key')
-                    ),
-                ],
-                ['forwardToReplicas' => true]
+            $settings = [
+                'searchableAttributes' => array_merge(
+                    $customSearchableattributes,
+                    $this->configResolver->getParameter(
+                        'searchable_attributes',
+                        Configuration::NAMESPACE
+                    )
+                ),
+                'attributesForFaceting' => $attributesForFaceting,
+                'attributesToRetrieve' => ['*'],
+            ];
+
+            ($this->client)(
+                function (SearchIndex $index) use ($replicas, $settings, $io) {
+                    $io->section('Index '.$index->getIndexName().' created.');
+                    $index->setSettings(
+                        array_merge(
+                            $settings,
+                            [
+                                'replicas' => array_map(
+                                    static function (string $suffix) use ($index) {
+                                        return "{$index->getIndexName()}-{$suffix}";
+                                    },
+                                    array_column($replicas, 'key')
+                                ),
+                            ],
+                        ),
+                        ['forwardToReplicas' => true]
+                    );
+                },
+                $language->languageCode,
+                AlgoliaClient::CLIENT_ADMIN_MODE
             );
 
-            $io->section('Index '.$index->getIndexName().' created.');
-
             foreach ($replicas as $replicaItem) {
-                $replica = $this->client->getIndex($language->languageCode, 'admin', $replicaItem['key']);
-                $io->writeln('replica '.$replica->getIndexName().' set');
-                $replica->setSettings(
-                    [
-                        'searchableAttributes' => array_merge(
-                            $customSearchableattributes,
-                            $this->configResolver->getParameter(
-                                'searchable_attributes',
-                                Configuration::NAMESPACE
+
+                ($this->client)(
+                    function (SearchIndex $index) use ($io, $settings, $replicaItem) {
+                        $io->writeln('Replica '.$index->getIndexName().' set');
+                        $index->setSettings(
+                            array_merge(
+                                $settings,
+                                [
+                                    'ranking' => array_merge(
+                                        [$replicaItem['condition']],
+                                        [
+                                            'typo',
+                                            'words',
+                                            'proximity',
+                                            'attribute',
+                                            'exact',
+                                        ]
+                                    ),
+                                ]
                             )
-                        ),
-                        'attributesForFaceting' => $attributesForFaceting,
-                        'attributesToRetrieve' => ['*'],
-                        'ranking' => array_merge(
-                            [$replicaItem['condition']],
-                            [
-                                'typo',
-                                'words',
-                                'proximity',
-                                'attribute',
-                                'exact',
-                            ]
-                        ),
-                    ]
+                        );
+
+                    },
+                    $language->languageCode,
+                    AlgoliaClient::CLIENT_ADMIN_MODE,
+                    $replicaItem['key']
                 );
             }
         }

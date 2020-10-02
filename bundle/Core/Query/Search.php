@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query;
 
+use Algolia\AlgoliaSearch\SearchIndex;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\AttributeGenerator;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\FullTextVisitor;
 use Novactive\Bundle\eZAlgoliaSearchEngine\DependencyInjection\Configuration;
@@ -141,7 +142,15 @@ final class Search
         string $query = '',
         array $requestOptions = []
     ): array {
-        return $this->client->getIndex($languageCode, 'search', $replaicaName)->search($query, $requestOptions);
+
+        return ($this->client)(
+            function (SearchIndex $index) use ($query, $requestOptions) {
+                return $index->search($query, $requestOptions);
+            },
+            $languageCode,
+            AlgoliaClient::CLIENT_SEARCH_NODE,
+            $replaicaName
+        );
     }
 
     public function getExtractedSearchResult(

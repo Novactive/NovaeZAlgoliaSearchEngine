@@ -118,7 +118,7 @@ class Indexer extends IncrementalIndexer
         }
     }
 
-    private function convertDocuments(iterator $documents, &$langObjectSet): void
+    private function convertDocuments(iterable $documents, &$langObjectSet): void
     {
         $contentLanguages = $mainTranslation = [];
         foreach ($documents as $document) {
