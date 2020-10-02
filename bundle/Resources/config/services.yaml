@@ -139,6 +139,24 @@ services:
         arguments:
             $contentTypeHandler: '@ezpublish.spi.persistence.content_type_handler'
 
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\Tags\TagIdVisitor:
+        tags:
+            - { name: ezplatform.search.algolia.query.content.criterion_visitor }
+            - { name: ezplatform.search.algolia.query.location.criterion_visitor }
+        arguments:
+            - "@ezpublish.spi.persistence.content_type_handler"
+            - "eztags"
+            - "tag_ids"
+
+    Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\Tags\TagKeywordVisitor:
+        tags:
+            - { name: ezplatform.search.algolia.query.content.criterion_visitor }
+            - { name: ezplatform.search.algolia.query.location.criterion_visitor }
+        arguments:
+            - "@ezpublish.spi.persistence.content_type_handler"
+            - "eztags"
+            - "tag_keywords"
+
     ### - Content specific
 
     Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\CriterionVisitor\Content\:
