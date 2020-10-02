@@ -44,16 +44,6 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
         return items;
     };
 
-    const facetLabel = attr => {
-        let i;
-        const frags = attr.split('_');
-        frags.pop();
-        for (i = 0; i < frags.length; i++) {
-            frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
-        }
-        return frags.join(' ');
-    };
-
     return (
         <div>
             <InstantSearch
@@ -129,7 +119,11 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
                                                     aria-expanded='true'
                                                     aria-controls='collapseOne'
                                                 >
-                                                    <h5 className={'mb-0'}><span className="badge badge-primary">{item.label}</span></h5>
+                                                    <h5 className={'mb-0'}>
+                                                        <span className='badge badge-primary'>
+                                                            {item.label}
+                                                        </span>
+                                                    </h5>
                                                 </button>
                                             </h2>
                                         </div>
@@ -141,7 +135,9 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
                                             data-parent='#customRefinementList'
                                         >
                                             <div className='card-body'>
-                                                <CustomRefinementList attribute={item.key}/>
+                                                <CustomRefinementList
+                                                    attribute={item.key}
+                                                />
                                             </div>
                                         </div>
                                     </div>

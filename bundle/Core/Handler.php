@@ -182,7 +182,7 @@ class Handler extends LegacyHandler
     {
         foreach ($this->languageService->loadLanguages() as $language) {
             $this->client->getIndex($language->languageCode)->deleteObject(
-                $this->documentIdGenerator->generateContentDocumentId($contentId, $language->languageCode)
+                $this->documentIdGenerator->generateContentDocumentId((int) $contentId, $language->languageCode)
             );
         }
 
@@ -193,7 +193,7 @@ class Handler extends LegacyHandler
     {
         foreach ($this->languageService->loadLanguages() as $language) {
             $this->client->getIndex($language->languageCode)->deleteObject(
-                $this->documentIdGenerator->generateLocationDocumentId($locationId, $language->languageCode)
+                $this->documentIdGenerator->generateLocationDocumentId((int) $locationId, $language->languageCode)
             );
         }
 

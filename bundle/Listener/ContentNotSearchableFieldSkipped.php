@@ -30,27 +30,58 @@ class ContentNotSearchableFieldSkipped
     public function beforeFieldSkipped(ContentNotSearchableFieldSkipEvent $event): void
     {
         $field = $event->getField();
-        if ('ezimage' === $field->type) {
-            $fieldDefinition = $event->getFieldDefinition();
-            $content = $this->contentService->loadContent(
-                $event->getContent()->versionInfo->contentInfo->id,
-                [$event->getDocument()->languageCode],
-                $event->getContent()->versionInfo->versionNo
+        $fieldDefinition = $event->getFieldDefinition();
+        $document = $event->getDocument();
+        $content = $event->getContent();
+
+        if ($fieldDefinition->id !== $field->fieldDefinitionId) {
+            return;
+        }
+
+        if ('ezimage' === $field->type && null !== $field->value->data) {
+            $valueContent = $this->contentService->loadContent(
+                $content->versionInfo->contentInfo->id,
+                [$document->languageCode],
+                $content->versionInfo->versionNo
             );
 
             /* @var ContentField $imageField */
-            $imageField = $content->getField($fieldDefinition->identifier);
+            $imageField = $valueContent->getField($fieldDefinition->identifier);
 
             $variation = $this->imageVariationHandler->getVariation(
                 $imageField,
-                $content->versionInfo,
+                $valueContent->versionInfo,
                 'medium'
             );
 
-            $document = $event->getDocument();
             $document->fields[] = new Field(
-                "{$content->getContentType()->identifier}_{$fieldDefinition->identifier}_uri",
-                $variation->uri,
+                "{$valueContent->getContentType()->identifier}_{$fieldDefinition->identifier}_uri",
+                parse_url($variation->uri)['path'],
+                new StringField()
+            );
+        }
+
+        if ('ezimageasset' === $field->type && null !== $field->value->data) {
+            $valueContent = $this->contentService->loadContent(
+                $content->versionInfo->contentInfo->id,
+                [$document->languageCode],
+                $content->versionInfo->versionNo
+            );
+
+            $relationContent = $this->contentService->loadContent($field->value->data['destinationContentId']);
+
+            /* @var ContentField $imageField */
+            $imageField = $relationContent->getField('image');
+
+            $variation = $this->imageVariationHandler->getVariation(
+                $imageField,
+                $relationContent->versionInfo,
+                'medium'
+            );
+
+            $document->fields[] = new Field(
+                "{$valueContent->getContentType()->identifier}_{$fieldDefinition->identifier}_uri",
+                parse_url($variation->uri)['path'],
                 new StringField()
             );
         }
