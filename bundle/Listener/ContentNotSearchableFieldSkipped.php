@@ -61,12 +61,13 @@ class ContentNotSearchableFieldSkipped
             );
         }
 
-        if ('ezimageasset' === $field->type && null !== $field->value->data) {
+        if ('ezimageasset' === $field->type && isset($field->value->data['destinationContentId'])) {
             $valueContent = $this->contentService->loadContent(
                 $content->versionInfo->contentInfo->id,
                 [$document->languageCode],
                 $content->versionInfo->versionNo
             );
+
 
             $relationContent = $this->contentService->loadContent($field->value->data['destinationContentId']);
 
