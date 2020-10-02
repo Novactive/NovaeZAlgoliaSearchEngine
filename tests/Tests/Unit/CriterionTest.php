@@ -14,6 +14,8 @@ namespace Tests\Unit;
 use eZ\Publish\API\Repository\Values\Content\LocationQuery;
 use eZ\Publish\API\Repository\Values\Content\Query;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
+use Netgen\TagsBundle\API\Repository\Values\Content\Query\Criterion\TagId;
+use Netgen\TagsBundle\API\Repository\Values\Content\Query\Criterion\TagKeyword;
 use Novactive\Bundle\eZAlgoliaSearchEngine\Core\Query\Search;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -39,10 +41,7 @@ class CriterionTest extends WebTestCase
             [new Criterion\ContentId([57, 58]), '(content_id_i=57 OR content_id_i=58)'],
             [new Criterion\ContentTypeId(2), '(content_type_id_i=2)'],
             [new Criterion\ContentTypeIdentifier('folder'), '(content_type_identifier_s:"folder")'],
-            [
-                new Criterion\ContentTypeGroupId(1),
-                '(content_type_group_id_mi=1)',
-            ],
+            [new Criterion\ContentTypeGroupId(1), '(content_type_group_id_mi=1)'],
             [
                 new Criterion\CustomField(
                     'article_author_count_i',
@@ -130,18 +129,9 @@ class CriterionTest extends WebTestCase
                 '(content_type_identifier_s:"article" OR content_type_identifier_s:"folder")'.
                 ' AND ((location_parent_id_mi=42) OR (content_type_id_i=1))',
             ],
-            [
-                new Criterion\MatchAll(),
-                'content_publication_date_timestamp_i > 0',
-            ],
-            [
-                new Criterion\MatchNone(),
-                'content_publication_date_timestamp_i < 0',
-            ],
-            [
-                new Criterion\ObjectStateId([1, 2]),
-                '(object_state_id_mi=1 OR object_state_id_mi=2)',
-            ],
+            [new Criterion\MatchAll(), 'content_publication_date_timestamp_i > 0'],
+            [new Criterion\MatchNone(), 'content_publication_date_timestamp_i < 0'],
+            [new Criterion\ObjectStateId([1, 2]), '(object_state_id_mi=1 OR object_state_id_mi=2)'],
             [
                 new Criterion\RemoteId('15aa056813f55caf7f38c7251c1634cc'),
                 '(content_remote_id_id:"15aa056813f55caf7f38c7251c1634cc")',
@@ -177,6 +167,14 @@ class CriterionTest extends WebTestCase
             [
                 new Criterion\Visibility(Criterion\Visibility::VISIBLE),
                 'location_visible_b:true',
+            ],
+            [
+                new TagId([1, 2]),
+                '(custom_type_eztags_tag_ids_mi=1 OR custom_type_eztags_tag_ids_mi=2)',
+            ],
+            [
+                new TagKeyword(Criterion\Operator::IN, ['specific', 'random']),
+                '(custom_type_eztags_tag_keywords_ms:"specific" OR custom_type_eztags_tag_keywords_ms:"random")',
             ],
         ];
     }

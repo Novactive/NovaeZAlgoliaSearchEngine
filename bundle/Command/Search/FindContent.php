@@ -14,6 +14,8 @@ namespace Novactive\Bundle\eZAlgoliaSearchEngine\Command\Search;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Query;
 use eZ\Publish\Core\Repository\Values\Content\Content;
+use Netgen\TagsBundle\API\Repository\Values\Content\Query\Criterion\TagId;
+use Netgen\TagsBundle\API\Repository\Values\Content\Query\Criterion\TagKeyword;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -54,11 +56,18 @@ final class FindContent extends Command
         $io = new SymfonyStyle($input, $output);
 
         $query = new Query();
-
-        $query->filter = new Criterion\ContentTypeIdentifier('article');
+        $query->limit = 5;
+        //$query->filter = new Criterion\ContentTypeIdentifier('custom_type');
+        $query->filter = new Criterion\LogicalAnd(
+            [
+                //new Criterion\ContentTypeIdentifier('custom_type'),
+                //new TagId([1, 2]),
+                new TagKeyword(Criterion\Operator::IN,['specific', 'random'])
+            ]
+        );
 
         $query->facetBuilders[] = new Query\FacetBuilder\ContentTypeFacetBuilder(['name' => 'ContentType']);
-        $query->sortClauses = [new Query\SortClause\ContentId()];
+        //$query->sortClauses = [new Query\SortClause\ContentId()];
 
         $result = $this->repository->getSearchService()->findContent($query);
 
