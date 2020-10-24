@@ -48,8 +48,7 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
         <div>
             <InstantSearch
                 searchClient={searchClient}
-                indexName={fullIndexName(indexName, queryParameters.replica)}
-            >
+                indexName={fullIndexName(indexName, queryParameters.replica)}>
                 <Configure
                     {...queryParameters.requestOptions}
                     page={queryParameters.page}
@@ -103,13 +102,11 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
                                 <div
                                     className='accordion'
                                     id='customRefinementList'
-                                    key={item.key}
-                                >
+                                    key={item.key}>
                                     <div className='card'>
                                         <div
                                             className='card-header'
-                                            id='headingOne'
-                                        >
+                                            id='headingOne'>
                                             <h2 className='mb-0'>
                                                 <button
                                                     className='btn btn-link btn-block text-left font-weight-bold'
@@ -117,8 +114,7 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
                                                     data-toggle='collapse'
                                                     data-target='#collapseOne'
                                                     aria-expanded='true'
-                                                    aria-controls='collapseOne'
-                                                >
+                                                    aria-controls='collapseOne'>
                                                     <h5 className={'mb-0'}>
                                                         <span className='badge badge-primary'>
                                                             {item.label}
@@ -132,8 +128,7 @@ const NovaEzAlgoliaSearch = ({ replicas, config, query }) => {
                                             id='collapseOne'
                                             className='collapse show'
                                             aria-labelledby='headingOne'
-                                            data-parent='#customRefinementList'
-                                        >
+                                            data-parent='#customRefinementList'>
                                             <div className='card-body'>
                                                 <CustomRefinementList
                                                     attribute={item.key}
@@ -181,8 +176,7 @@ const HitsPerPage = ({ items, currentRefinement, refine, createURL }) => {
                 id='hitsPerPageLink'
                 data-toggle='dropdown'
                 aria-haspopup='true'
-                aria-expanded='false'
-            >
+                aria-expanded='false'>
                 {currentRefinement + ' hits per page'}
             </a>
             <div className='dropdown-menu' aria-labelledby='hitsPerPageLink'>
@@ -194,8 +188,7 @@ const HitsPerPage = ({ items, currentRefinement, refine, createURL }) => {
                         onClick={event => {
                             event.preventDefault();
                             refine(item.value);
-                        }}
-                    >
+                        }}>
                         {item.label}
                     </a>
                 ))}
@@ -223,8 +216,7 @@ const SortBy = ({ items, refine, currentRefinement, createURL }) => {
                 id='sortByLink'
                 data-toggle='dropdown'
                 aria-haspopup='true'
-                aria-expanded='false'
-            >
+                aria-expanded='false'>
                 {currentLabel}
             </a>
             <div className='dropdown-menu' aria-labelledby='sortByLink'>
@@ -236,8 +228,7 @@ const SortBy = ({ items, refine, currentRefinement, createURL }) => {
                         onClick={event => {
                             event.preventDefault();
                             refine(item.value);
-                        }}
-                    >
+                        }}>
                         {item.label}
                     </a>
                 ))}
@@ -264,8 +255,7 @@ const RefinementList = ({
                     onClick={event => {
                         event.preventDefault();
                         refine(item.value);
-                    }}
-                >
+                    }}>
                     {isFromSearch ? (
                         <Highlight attribute='label' hit={item} />
                     ) : (
@@ -359,16 +349,14 @@ const Pagination = ({ currentRefinement, nbPages, refine, createURL }) => (
                         }
                         {...(currentRefinement === page && {
                             'aria-current': 'page'
-                        })}
-                    >
+                        })}>
                         <a
                             href={createURL(page)}
                             className={'page-link'}
                             onClick={event => {
                                 event.preventDefault();
                                 refine(page);
-                            }}
-                        >
+                            }}>
                             {page}
                         </a>
                     </li>

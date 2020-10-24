@@ -3,6 +3,7 @@ parameters:
     nova_ezalgoliasearchengine.default.app_id: ~
     nova_ezalgoliasearchengine.default.api_secret_key: ~
     nova_ezalgoliasearchengine.default.api_search_only_key: ~
+    nova_ezalgoliasearchengine.default.license_key: ~
     nova_ezalgoliasearchengine.default.searchable_attributes:
         - content_id_i
         - content_remote_id_id
